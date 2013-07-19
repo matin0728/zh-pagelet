@@ -1,0 +1,25 @@
+{
+  "name": "zh-pagelet",
+  "version": "0.1.0",
+  "description": "Html5 based page rendering engine.",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "matin0728/zh-pagelet"
+  },
+  "keywords": [
+    "javascript",
+    "html5",
+    "pipe",
+    "zhihu"
+  ],
+  "author": "matin0728",
+  "license": "MIT",
+  "readmeFilename": "Readme.md",
+  "devDependencies": {
+    "grunt": "~0.4.1"
+  }
+}

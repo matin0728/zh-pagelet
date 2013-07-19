@@ -1,0 +1,14 @@
+{
+  "name": "zh-pagelet",
+  "repo": "matin0728/zh-pagelet",
+  "description": "Html5 based page block rendering engine.",
+  "version": "0.0.1",
+  "keywords": [],
+  "dependencies": {},
+  "development": {},
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": [
+    "index.js"
+  ]
+}
