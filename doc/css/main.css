@@ -1,0 +1,77 @@
+ul{width:180px;float:left;list-style:none;font-size:12px;margin:0;padding:0;}
+#submenu > ul > li{border-bottom:1px solid #f2f2f2;list-style:none;color:#222;font-weight:700;text-transform:uppercase;margin:0;padding:0;}
+#submenu li{list-style:none;}
+#submenu li a{color:#444;display:block;text-decoration:none;position:relative;font-weight:700;margin:0;padding:10px 20px;}
+#submenu li a:hover,#submenu li a:active,#submenu .current_page_item a{color:#F7584A;}
+#submenu li a.sf-with-ul{padding-right:10px;}
+#submenu li ul li a,#submenu li ul li a:link,#submenu li ul li a:visited,#submenu li ul li ul li a,#submenu li ul li ul li a:link,#submenu li ul li ul li a:visited,#submenu li ul li ul li ul li a,#submenu li ul li ul li ul li a:link,#submenu li ul li ul li ul li a:visited{color:#58535F;width:148px;border-top:1px solid #f4f4f4;position:relative;font-weight:400;margin:0;padding:10px;}
+#submenu ul li ul li:first-child a,#submenu ul li ul li ul li:first-child a,#submenu ul li ul li ul li ul li:first-child a{border-top:none;}
+#submenu li ul li a:hover,#submenu li ul li ul li a:hover,#submenu li ul li ul li ul li a:hover{color:#4d4854;background:#fff;}
+#submenu li ul{font-size:10px;z-index:9999;position:absolute;left:-999em;height:auto;width:170px;background:#fcfcfc;margin:-41px 0 0 170px;padding:5px;}
+#submenu li ul a{width:150px;}
+#submenu li ul ul{margin:-40px 0 0 175px;}
+#submenu li:hover ul ul,#submenu li:hover ul ul ul,#submenu li.sfHover ul ul,#submenu li.sfHover ul ul ul{left:-999em;}
+#submenu li:hover ul,#submenu li li:hover ul,#submenu li li li:hover ul,#submenu li.sfHover ul,#submenu li li.sfHover ul,#submenu li li li.sfHover ul{left:auto;}
+#submenu li:hover,#submenu li.sfHover{position:static;}
+#main{background:#fff;width:800px;float:left;margin:30px 0 0 240px;}
+#primary{width:500px;float:left;margin:0 10px 0 20px;padding:20px 0;}
+#secondary{width:240px;float:left;margin:0 20px 0 10px;padding:20px 0;}
+.mesh{background:url(http://4.bp.blogspot.com/-n4yoIyNO054/UYxbRM_f-TI/AAAAAAAAJMM/Xxu0d_ZmbbM/s000/mesh.png);width:100%;height:100%;position:absolute;top:0;}
+.dome{position:absolute;bottom:30px;left:50%;margin-left:-30px;height:30px;width:60px;background:url(http://4.bp.blogspot.com/-EqlETpWDBiQ/UYxbRsauwpI/AAAAAAAAJMU/A7dtynWNrzY/s000/dome.png);-webkit-transition:all 200 ease;-moz-transition:all 200 ease;-ms-transition:all 200 ease;-o-transition:all 200 ease;transition:all 200 ease;}
+.dome ul li{float:left;list-style:none;width:14px;height:17px;cursor:pointer;}
+.dome ul li#arrow_right{background:url(http://2.bp.blogspot.com/-MQBGxCKCEi4/UYxbSHbNk7I/AAAAAAAAJMc/FMZ1gM5RjjM/s000/arright.png);margin:8px 0 0 8px;}
+.dome ul li#arrow_left{background:url(http://1.bp.blogspot.com/-rrxDrBqiUhw/UYxbSlvIUCI/AAAAAAAAJMk/FL6HEpL7LNc/s000/arleft.png);margin:8px 0 0 11px;}
+#headersec .page-header{margin:0 0 20px;}
+h1.page-title{color:#EA5546;font-size:16px;margin:0 0 5px;}
+.entry-header{margin:0;padding:10px 0 5px;}
+h2.entry-title{font-size:20px;color:#111;text-transform:uppercase;margin:0;padding:0;}
+h2.entry-title a:link,h2.entry-title a:visited{color:#111;}
+img.postimg{border-bottom:5px solid #EA5546;margin:20px 0 0;}
+.postdate{width:80px;float:left;}
+.postdate .date{font-size:64px;font-weight:900;color:#ccc;line-height:58px;margin:0 0 10px;}
+.postdate .mear{font-size:10px;display:block;}
+.postentry{float:left;width:400px;margin:0 0 0 10px;}
+a.rmore{background:#EA5546;color:#fff;float:right;padding:5px 10px;}
+.post .entry-meta{border-top:1px solid #e5e5e5;padding:10px 0;}
+.sidebar{color:#838087;}
+.sidebar a{text-decoration:none;color:#838087;}
+.sidebar a:hover{text-decoration:none;color:#FA6C65;}
+.sidebar .widget{background:#fff;margin:0 0 25px;padding:0;}
+.sidebar .widget h2{color:#333;font-size:14px;font-weight:600;text-transform:uppercase;background:url(http://3.bp.blogspot.com/-UvwBpCWVqls/UYxbTF_CHlI/AAAAAAAAJMs/H5unEJcIMHg/s000/line.png) left bottom no-repeat;padding:0 0 10px;}
+h3.sidetitl{color:#333;font-size:14px;font-weight:600;text-transform:uppercase;background:url(http://3.bp.blogspot.com/-UvwBpCWVqls/UYxbTF_CHlI/AAAAAAAAJMs/H5unEJcIMHg/s000/line.png) left bottom no-repeat;padding:20px 0 10px;}
+.sidebar ul{list-style-type:none;list-style:none;margin:0;padding:0;}
+.sidebar ul li{border-bottom:1px solid #ddd;margin:3px 0;padding:5px 0;}
+.site-footer{background:#f2f2f2;width:100%;position:fixed;bottom:0;}
+.site-info{text-align:center;font-size:11px;line-height:14px;height:28px;padding:5px 0;}
+.fcred{color:#777;padding:0 10px;}
+.fcred a:link,.fcred a:visited{color:#777;text-decoration:none;}
+h2.date-header{display:none;margin:1.5em 0 .5em;}
+.main .widget{margin:0 0 5px;padding:0 0 2px;}
+.main .Blog{border-bottom-width:0;}
+#header .description{color:#fff;font-size:14px;text-shadow:0 1px 0 #000;}
+#comments{color:#666;margin-bottom:20px;padding:10px;}
+#comments h4{font-size:22px;margin-bottom:10px;}
+#comment-name-url{width:365px;float:left;}
+#comment-date{width:365px;float:left;margin-top:5px;font-size:10px;}
+#comment-header{float:left;position:relative;background-color:#fff;border:1px dashed #eee;margin:5px 0 15px;padding:5px 0 40px 10px;}
+.avatar-image-container{background:url(http://2.bp.blogspot.com/-V5nl2c0VVNg/UYxbTtZWR5I/AAAAAAAAJM0/SKkhIz4iC8E/s000/comment-avatar.jpg);width:32px;height:32px;float:right;border:1px solid #ddd;margin:5px 10px 5px 5px;}
+.avatar-image-container img{width:32px;height:32px;}
+a.comments-autor-name{color:#000;font:normal bold 14px Arial, Tahoma, Verdana;}
+a.says{color:#000;font:normal 14px Arial, Tahoma, Verdana;}
+.says a:hover{text-decoration:none;}
+.deleted-comment{font-style:italic;color:gray;}
+#blog-pager-newer-link{float:left;}
+#blog-pager-older-link{float:right;}
+#blog-pager{text-align:center;padding:5px;}
+.feed-links{clear:both;}
+.profile-img{float:left;border:1px solid #eee;margin:0 5px 5px 0;padding:4px;}
+.profile-data{text-transform:uppercase;letter-spacing:.1em;color:#000;font-weight:700;line-height:1.6em;margin:0;}
+.profile-datablock{margin:.5em 0;}
+.profile-textblock{line-height:1.6em;margin:.5em 0;}
+.profile-link{text-transform:uppercase;letter-spacing:.1em;}
+.comment-form{max-width:600px;}
+#navbar-iframe{height:0;visibility:hidden;display:none;}
+.PopularPosts .widget-content ul li{padding:6px 0;}
+.reaction-buttons table{border:none;margin-bottom:5px;}
+#submenu > ul > li:last-child,.reaction-buttons table,.reaction-buttons td{border:none;}
+.dome ul,.sidebar .widget-content{margin:0;padding:0;}
