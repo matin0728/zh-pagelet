@@ -42,25 +42,53 @@ module.exports = function(grunt) {
         dest: 'build/<%= pkg.name %>.min.js'
       }
     },
-    connect: {
-      server: {
-        options: {
-          port: port,
-          base: '.'
-        }
+    closureDepsWriter: {
+      options: {
+        closureLibraryPath: 'src/google-closure-library',
+        root_with_prefix: '"src ../../../src"'
+      },
+      standalone: {
+        dest: 'src/deps.js'
+      }
+    },
+    copy: {
+      mocha: {
+        files: [
+          {
+            expand: true,
+            flatten: true,
+            src: [
+              'node_modules/grunt-mocha/example/test/js/mocha.js',
+              'node_modules/grunt-mocha/example/test/js/chai.js',
+              'node_modules/grunt-mocha/phantomjs/bridge.js',
+            ],
+            dest: 'test/js/',
+          },
+          {
+            expand: true,
+            flatten: true,
+            src: 'node_modules/grunt-mocha/example/test/css/mocha.css',
+            dest: 'test/css/',
+          }
+        ]
       }
     }
   });
-
-  // Load the plugin that provides the "uglify" task.
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-jade');
-  grunt.loadNpmTasks('grunt-mocha');
-  grunt.loadNpmTasks('grunt-contrib-connect');
-  // grunt.loadNpmTasks('grunt-contrib-connect');
   
-  // Alias 'test' to 'mocha' so you can run `grunt test`
-  grunt.task.registerTask('test', ['connect', 'mocha']);
+  grunt.loadNpmTasks('grunt-contrib-jade');
+  grunt.loadNpmTasks('grunt-closure-tools');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-mocha');
+  
+
+    // 先生成一个独立的 deps 文件，再运行 mocha
+  grunt.registerTask('test', ['closureDepsWriter:standalone', 'mocha']);
+
 
   // Default task(s).
   grunt.registerTask('default', ['jade']);
