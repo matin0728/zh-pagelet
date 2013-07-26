@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<script src="/src/google-closure-library/closure/goog/base.js"></script>
+		<script src="/vendor/google-closure-library/closure/goog/base.js"></script>
 		<script src="/src/deps.js"></script>
 		<script>
 			goog.require('ZH.demo')
@@ -16,6 +16,9 @@
 			}else{
 				document.write('Damm!!!!')
 			}
+
+			var d = new ZH.demo()
+			d.sayHello()
 
 		</script>
 

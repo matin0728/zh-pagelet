@@ -44,8 +44,8 @@ module.exports = function(grunt) {
     },
     closureDepsWriter: {
       options: {
-        closureLibraryPath: 'src/google-closure-library',
-        root_with_prefix: '"src ../../../src"'
+        closureLibraryPath: 'vendor/google-closure-library',
+        root_with_prefix: '"src ../../../../src"'
       },
       standalone: {
         dest: 'src/deps.js'

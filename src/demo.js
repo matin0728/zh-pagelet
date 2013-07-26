@@ -1,17 +1,22 @@
-goog.provide('ZH.demo')
+goog.require('goog.ui.Component')
 
-goog.require('goog.ui.Compnent')
+goog.provide('ZH.demo')
 
 
 ZH.demo = function(){
 	this.name = 'demo_component'
 };
 
-goog.inherits( ZH.demo, goog.ui.Compnent)
+goog.inherits( ZH.demo, goog.ui.Component)
 
 
 ZH.demo.prototype.sayHello = function(){
 	console.log(this.name)
 }
+
+
+
+
+
 
 
