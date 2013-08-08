@@ -1,0 +1,22 @@
+!!!5
+html(lang="en")
+  head
+    title= pageTitle
+    link(href="/doc/css/bootstrap.auto.css", rel="stylesheet")
+    link(href="/doc/css/main.auto.css", rel="stylesheet")
+  body.app
+    include block_head
+    .container-fluid
+      .row-fluid
+        .span3
+          .well.sidebar-nav
+            ul.nav.nav-list
+              li.nav-header HelpIndex
+              li.active
+                a(href="/doc/pagelet.html") Pagelet
+              li
+                a(href="#") LiveComponent
+                
+        block content
+
+  script(src="http://localhost:35729/livereload.js")

@@ -1,9 +1,0 @@
-[submodule "src/closure"]
-	path = src/closure
-	url = https://code.google.com/p/closure-library/
-[submodule "src/google-closure-library"]
-	path = src/google-closure-library
-	url = https://code.google.com/p/closure-library/
-[submodule "vendor/google-closure-library"]
-	path = vendor/google-closure-library
-	url = https://code.google.com/p/closure-library/

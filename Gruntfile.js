@@ -12,10 +12,25 @@ module.exports = function(grunt) {
             debug: false
           }
         },
-        files: {
-          // {"src": "doc/src/tpl_.html", "des": "doc/*.html"}
-          "doc/pagelet.html":"doc/src/tpl_pagelet.jade"
-        }
+        files: [
+          {
+            expand: true,     // Enable dynamic expansion.
+            cwd: 'doc/src/',      // Src matches are relative to this path.
+            src: ['*.jade', '!block_*.jade'], // Actual pattern(s) to match.
+            dest: 'doc/',   // Destination path prefix.
+            ext: '.html',   // Dest filepaths will have this extension.
+          }
+
+        ]
+      }
+    },
+    connect: {
+      dev_server:{
+        options: {
+          port: 8888,
+          base: './',
+          keepalive: true 
+        } 
       }
     },
     mocha: {
@@ -51,6 +66,32 @@ module.exports = function(grunt) {
         dest: 'src/deps.js'
       }
     },
+    less: {
+      development: {
+        options: {
+          paths: ["doc/css/less/", "doc/css/bootstrap/"]
+        },
+        files: {
+          "doc/css/bootstrap.auto.css": "doc/css/bootstrap/bootstrap.less",
+          "doc/css/main.auto.css": "doc/css/less/main.less"
+        }
+      }
+    },
+    watch: {
+      options: {
+        // Start a live reload server on the default port 35729
+        livereload: true,
+      },
+      all: {
+        files: [
+          "doc/css/less/**/*.less",
+          "doc/src/*.jade"
+        ],
+        // tasks: ['less', 'cssmin']
+        tasks: ["less", "jade"],
+
+      }
+    },
     copy: {
       mocha: {
         files: [
@@ -74,9 +115,11 @@ module.exports = function(grunt) {
       }
     }
   });
-  
+
+
   grunt.loadNpmTasks('grunt-contrib-jade');
   grunt.loadNpmTasks('grunt-closure-tools');
+  grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -84,14 +127,19 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-mocha');
+
+  grunt.event.on('watch', function(action, filepath, target) {
+    grunt.log.writeln(target + ': ' + filepath + ' has ' + action);
+  });
   
 
     // 先生成一个独立的 deps 文件，再运行 mocha
   grunt.registerTask('test', ['closureDepsWriter:standalone', 'mocha']);
 
+  grunt.registerTask('dev_server', ['connect:dev_server']);
 
   // Default task(s).
-  grunt.registerTask('default', ['jade']);
+  grunt.registerTask('default', ['less', 'jade']);
   // grunt.registerTask('default', ['uglify']);
   // grunt.registerTask('server', ['server']);
 };

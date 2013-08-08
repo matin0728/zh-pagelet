@@ -1,4 +1,63 @@
-<!DOCTYPE html><html lang="en"><head><title></title></head><body><h1>Jade - node template engine</h1><div id="container" class="col"><p>Get on it!</p><p>Jade is a terse and simple
+<!DOCTYPE html><html lang="en"><head><title></title><link href="/doc/css/bootstrap.auto.css" rel="stylesheet"><link href="/doc/css/main.auto.css" rel="stylesheet"></head><body class="app"><div class="navbar navbar-inverse navbar-fixed-top"><div class="navbar-inner"><div class="container-fluid"><a class="brand">SmartPagelet</a></div></div></div><div class="container-fluid"><div class="row-fluid"><div class="span3"><div class="well sidebar-nav"><ul class="nav nav-list"><li class="nav-header">HelpIndex</li><li class="active"><a href="/doc/pagelet.html">Pagelet</a></li><li><a href="#">LiveComponent</a></li></ul></div></div><div class="span9"><h1>Pagelet</h1>
+
+<h2>定义</h2>
+
+<pre><code>它是可以被 Pagelet 处理器执行的页面片断，它负责生成具有特定功能的页面区域，包含构成它的 html 代码、展示样式及相关的交互行为；一个 Pagelet 的执行结果可以实现：
+</code></pre>
+
+<ul>
+<li>在指定区域添加新的内容区块</li>
+<li>更新现有的内容区块</li>
+<li>移除现有的内容区块</li>
+</ul>
+
+<p>一个 Pagelet 包含如下内容：</p>
+
+<ul>
+<li>js: 指向当前内容区块初始化的 js 的地址</li>
+<li>css: 当前区块需要的样式表文件</li>
+<li>html: 用于生成视图的模板</li>
+<li>model: 生成视图的模型，暂时只有 mvc 的节点才需要</li>
+<li>*cls: TBD, 这个应该可以直接 require 一下即可，对应的 LiveComponent 类型</li>
+<li>*config: TBD, 这个应该暂时不需要，信息应该都包含在 meta 里面了</li>
+<li>meta: 用于生成这个 LiveComponent 的参数</li>
+<li>render_mode: 渲染方式， inner | replace | before | after | decorate</li>
+<li>refer_element: 参考定位的元素 id | null(document) | name@class</li>
+</ul>
+
+<h1>LiveComponent</h1>
+
+<pre><code>它是所有 Live 组件的基类，提供类似 Widge 的一些基本功能，事件监听等
+</code></pre>
+
+<h2>什么是 Pagelet 呢?</h2>
+
+<pre><code>    var a = 1
+    var b = [1, 2, 3]
+    var c = b.reverse()
+</code></pre>
+
+<ul>
+<li>首选 </li>
+<li>其次</li>
+<li><p>第三</p>
+
+<ol><li>为啥忆经</li>
+<li>再来一个</li>
+<li>No one take care about us.</li></ol></li>
+</ul>
+
+<p>然后你就可以使用<code>npm install</code>来搞定所有的事情，哈哈哈</p>
+
+<blockquote>
+  <p>然后叫，他就出门去了。 
+  第二天，我们在那里发现了他
+  Is life always this hard or is it just when you are a kid?</p>
+</blockquote>
+
+<p>This  is some <strong>text</strong> with a <a href="http://fusesource.com">FuseSource</a> link.</p>
+
+<p>I will choose <a href="http://zhihu.com">this</a> to tell you my angry.</p><h1>Jade - node template engine</h1><div id="container" class="col"><p>Get on it!</p><p>Jade is a terse and simple
 templating language with a
 strong focus on performance
-and powerful features.</p></div></body></html>
+and powerful features.</p></div></div></div></div></body><script src="http://localhost:35729/livereload.js"></script></html>
