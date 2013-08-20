@@ -1,18 +1,16 @@
-goog.require('goog.ui.Component')
+goog.require('goog.ui.Component');
 
-goog.provide('ZH.demo')
-
+goog.provide('ZH.demo');
 
 ZH.demo = function(){
-	this.name = 'demo_component'
+	this.name = 'demo_component';
 };
 
-goog.inherits( ZH.demo, goog.ui.Component)
-
+goog.inherits( ZH.demo, goog.ui.Component);
 
 ZH.demo.prototype.sayHello = function(){
-	console.log(this.name)
-}
+	console.log(this.name);
+};
 
 
 

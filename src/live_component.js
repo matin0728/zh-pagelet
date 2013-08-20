@@ -4,10 +4,10 @@
  *
  */
 
-goog.provide('goog.ui.Component');
-goog.provide('goog.ui.Component.Error');
-goog.provide('goog.ui.Component.EventType');
-goog.provide('goog.ui.Component.State');
+goog.provide('ZH.ui.LiveComponent');
+goog.provide('ZH.ui.LiveComponent.Error');
+goog.provide('ZH.ui.LiveComponent.EventType');
+goog.provide('ZH.ui.LiveComponent.State');
 
 goog.require('goog.array');
 goog.require('goog.asserts');
@@ -18,6 +18,7 @@ goog.require('goog.events.EventTarget');
 goog.require('goog.object');
 goog.require('goog.style');
 goog.require('goog.ui.IdGenerator');
+goog.require('ZH.core.Registry');
 
 
 
@@ -28,12 +29,12 @@ goog.require('goog.ui.IdGenerator');
  * @constructor
  * @extends {goog.events.EventTarget}
  */
-goog.ui.Component = function(opt_options, opt_domHelper) {
+ ZH.ui.LiveComponent = function(opt_options, opt_domHelper) {
   goog.events.EventTarget.call(this);
   this.dom_ = opt_domHelper || goog.dom.getDomHelper();
-  this.options = goog.object.extends(this.defaults, opt_options || {});
+  this.options = goog.object.extend(this.defaults, opt_options || {});
 };
-goog.inherits(goog.ui.Component, goog.events.EventTarget);
+goog.inherits( ZH.ui.LiveComponent, goog.events.EventTarget);
 
 
 /**
@@ -42,7 +43,7 @@ goog.inherits(goog.ui.Component, goog.events.EventTarget);
  *     document, and avoid calling enterDocument if it isn't. If false, we
  *     maintain legacy behavior (always call enterDocument from decorate).
  */
-goog.define('goog.ui.Component.ALLOW_DETACHED_DECORATION', false);
+goog.define('ZH.ui.LiveComponent.ALLOW_DETACHED_DECORATION', false);
 
 
 
@@ -53,7 +54,13 @@ goog.define('goog.ui.Component.ALLOW_DETACHED_DECORATION', false);
  * the corresponding state change.
  * @enum {string}
  */
-goog.ui.Component.EventType = {
+ ZH.ui.LiveComponent.EventType = {
+  ON_LIVE_MESSAGE: 'on_live_message',
+  /** Update by pagelet. */
+  ON_LIVE_UPDATE: 'on_live_update',
+
+  LIVE_UPDATED: 'live_updated',
+
   /** Dispatched before the component becomes visible. */
   BEFORE_SHOW: 'beforeshow',
 
@@ -128,7 +135,7 @@ goog.ui.Component.EventType = {
  * Errors thrown by the component.
  * @enum {string}
  */
-goog.ui.Component.Error = {
+ ZH.ui.LiveComponent.Error = {
   /**
    * Error when a method is not supported.
    */
@@ -182,7 +189,7 @@ goog.ui.Component.Error = {
  * all states.
  * @enum {number}
  */
-goog.ui.Component.State = {
+ ZH.ui.LiveComponent.State = {
   /**
    * Union of all supported component states.
    */
@@ -190,51 +197,51 @@ goog.ui.Component.State = {
 
   /**
    * Component is disabled.
-   * @see goog.ui.Component.EventType.DISABLE
-   * @see goog.ui.Component.EventType.ENABLE
+   * @see  ZH.ui.LiveComponent.EventType.DISABLE
+   * @see  ZH.ui.LiveComponent.EventType.ENABLE
    */
   DISABLED: 0x01,
 
   /**
    * Component is highlighted.
-   * @see goog.ui.Component.EventType.HIGHLIGHT
-   * @see goog.ui.Component.EventType.UNHIGHLIGHT
+   * @see  ZH.ui.LiveComponent.EventType.HIGHLIGHT
+   * @see  ZH.ui.LiveComponent.EventType.UNHIGHLIGHT
    */
   HOVER: 0x02,
 
   /**
    * Component is active (or "pressed").
-   * @see goog.ui.Component.EventType.ACTIVATE
-   * @see goog.ui.Component.EventType.DEACTIVATE
+   * @see  ZH.ui.LiveComponent.EventType.ACTIVATE
+   * @see  ZH.ui.LiveComponent.EventType.DEACTIVATE
    */
   ACTIVE: 0x04,
 
   /**
    * Component is selected.
-   * @see goog.ui.Component.EventType.SELECT
-   * @see goog.ui.Component.EventType.UNSELECT
+   * @see  ZH.ui.LiveComponent.EventType.SELECT
+   * @see  ZH.ui.LiveComponent.EventType.UNSELECT
    */
   SELECTED: 0x08,
 
   /**
    * Component is checked.
-   * @see goog.ui.Component.EventType.CHECK
-   * @see goog.ui.Component.EventType.UNCHECK
+   * @see  ZH.ui.LiveComponent.EventType.CHECK
+   * @see  ZH.ui.LiveComponent.EventType.UNCHECK
    */
   CHECKED: 0x10,
 
   /**
    * Component has focus.
-   * @see goog.ui.Component.EventType.FOCUS
-   * @see goog.ui.Component.EventType.BLUR
+   * @see  ZH.ui.LiveComponent.EventType.FOCUS
+   * @see  ZH.ui.LiveComponent.EventType.BLUR
    */
   FOCUSED: 0x20,
 
   /**
    * Component is opened (expanded).  Applies to tree nodes, menu buttons,
    * submenus, zippys (zippies?), etc.
-   * @see goog.ui.Component.EventType.OPEN
-   * @see goog.ui.Component.EventType.CLOSE
+   * @see  ZH.ui.LiveComponent.EventType.OPEN
+   * @see  ZH.ui.LiveComponent.EventType.CLOSE
    */
   OPENED: 0x40
 };
@@ -243,41 +250,41 @@ goog.ui.Component.State = {
 /**
  * Static helper method; returns the type of event components are expected to
  * dispatch when transitioning to or from the given state.
- * @param {goog.ui.Component.State} state State to/from which the component
+ * @param { ZH.ui.LiveComponent.State} state State to/from which the component
  *     is transitioning.
  * @param {boolean} isEntering Whether the component is entering or leaving the
  *     state.
- * @return {goog.ui.Component.EventType} Event type to dispatch.
+ * @return { ZH.ui.LiveComponent.EventType} Event type to dispatch.
  */
-goog.ui.Component.getStateTransitionEvent = function(state, isEntering) {
+ ZH.ui.LiveComponent.getStateTransitionEvent = function(state, isEntering) {
   switch (state) {
-    case goog.ui.Component.State.DISABLED:
-      return isEntering ? goog.ui.Component.EventType.DISABLE :
-          goog.ui.Component.EventType.ENABLE;
-    case goog.ui.Component.State.HOVER:
-      return isEntering ? goog.ui.Component.EventType.HIGHLIGHT :
-          goog.ui.Component.EventType.UNHIGHLIGHT;
-    case goog.ui.Component.State.ACTIVE:
-      return isEntering ? goog.ui.Component.EventType.ACTIVATE :
-          goog.ui.Component.EventType.DEACTIVATE;
-    case goog.ui.Component.State.SELECTED:
-      return isEntering ? goog.ui.Component.EventType.SELECT :
-          goog.ui.Component.EventType.UNSELECT;
-    case goog.ui.Component.State.CHECKED:
-      return isEntering ? goog.ui.Component.EventType.CHECK :
-          goog.ui.Component.EventType.UNCHECK;
-    case goog.ui.Component.State.FOCUSED:
-      return isEntering ? goog.ui.Component.EventType.FOCUS :
-          goog.ui.Component.EventType.BLUR;
-    case goog.ui.Component.State.OPENED:
-      return isEntering ? goog.ui.Component.EventType.OPEN :
-          goog.ui.Component.EventType.CLOSE;
+    case  ZH.ui.LiveComponent.State.DISABLED:
+      return isEntering ?  ZH.ui.LiveComponent.EventType.DISABLE :
+           ZH.ui.LiveComponent.EventType.ENABLE;
+    case  ZH.ui.LiveComponent.State.HOVER:
+      return isEntering ?  ZH.ui.LiveComponent.EventType.HIGHLIGHT :
+           ZH.ui.LiveComponent.EventType.UNHIGHLIGHT;
+    case  ZH.ui.LiveComponent.State.ACTIVE:
+      return isEntering ?  ZH.ui.LiveComponent.EventType.ACTIVATE :
+           ZH.ui.LiveComponent.EventType.DEACTIVATE;
+    case  ZH.ui.LiveComponent.State.SELECTED:
+      return isEntering ?  ZH.ui.LiveComponent.EventType.SELECT :
+           ZH.ui.LiveComponent.EventType.UNSELECT;
+    case  ZH.ui.LiveComponent.State.CHECKED:
+      return isEntering ?  ZH.ui.LiveComponent.EventType.CHECK :
+           ZH.ui.LiveComponent.EventType.UNCHECK;
+    case  ZH.ui.LiveComponent.State.FOCUSED:
+      return isEntering ?  ZH.ui.LiveComponent.EventType.FOCUS :
+           ZH.ui.LiveComponent.EventType.BLUR;
+    case  ZH.ui.LiveComponent.State.OPENED:
+      return isEntering ?  ZH.ui.LiveComponent.EventType.OPEN :
+           ZH.ui.LiveComponent.EventType.CLOSE;
     default:
       // Fall through.
   }
 
   // Invalid state.
-  throw Error(goog.ui.Component.Error.STATE_INVALID);
+  throw new Error( ZH.ui.LiveComponent.Error.STATE_INVALID);
 };
 
 /**
@@ -285,17 +292,22 @@ goog.ui.Component.getStateTransitionEvent = function(state, isEntering) {
  * @type {?Object}
  * @private
  */
-goog.ui.Component.prototype.defaults = {};
+ ZH.ui.LiveComponent.prototype.defaults = {
+  //Dont move child on adding, case child may in diff dom level, if this
+  //is a container, and all childs is the same type, set this option to 
+  //true on demond.
+  maintainChildDomIndex: false
+ };
 
 
 /**
  * Unique ID of the component, lazily initialized in {@link
- * goog.ui.Component#getId} if needed.  This property is strictly private and
+ *  ZH.ui.LiveComponent#getId} if needed.  This property is strictly private and
  * must not be accessed directly outside of this class!
  * @type {?string}
  * @private
  */
-goog.ui.Component.prototype.id_ = null;
+ ZH.ui.LiveComponent.prototype.id_ = null;
 
 
 /**
@@ -305,7 +317,7 @@ goog.ui.Component.prototype.id_ = null;
  * @protected
  * @suppress {underscore}
  */
-goog.ui.Component.prototype.dom_;
+ ZH.ui.LiveComponent.prototype.dom_ = null;
 
 
 /**
@@ -313,7 +325,7 @@ goog.ui.Component.prototype.dom_;
  * @type {boolean}
  * @private
  */
-goog.ui.Component.prototype.inDocument_ = false;
+ ZH.ui.LiveComponent.prototype.inDocument_ = false;
 
 
 // TODO(attila): Stop referring to this private field in subclasses.
@@ -322,7 +334,7 @@ goog.ui.Component.prototype.inDocument_ = false;
  * @type {Element}
  * @private
  */
-goog.ui.Component.prototype.element_ = null;
+ ZH.ui.LiveComponent.prototype.element_ = null;
 
 
 /**
@@ -333,7 +345,7 @@ goog.ui.Component.prototype.element_ = null;
  * @type {goog.events.EventHandler}
  * @private
  */
-goog.ui.Component.prototype.googUiComponentHandler_;
+ ZH.ui.LiveComponent.prototype.googUiComponentHandler_ = null;
 
 
 /**
@@ -341,26 +353,26 @@ goog.ui.Component.prototype.googUiComponentHandler_;
  * @type {*}
  * @private
  */
-goog.ui.Component.prototype.model_ = null;
+ ZH.ui.LiveComponent.prototype.model_ = null;
 
 
 /**
  * Parent component to which events will be propagated.  This property is
  * strictly private and must not be accessed directly outside of this class!
- * @type {goog.ui.Component?}
+ * @type { ZH.ui.LiveComponent?}
  * @private
  */
-goog.ui.Component.prototype.parent_ = null;
+ ZH.ui.LiveComponent.prototype.parent_ = null;
 
 
 /**
  * Array of child components.  Lazily initialized on first use.  Must be kept in
  * sync with {@code childIndex_}.  This property is strictly private and must
  * not be accessed directly outside of this class!
- * @type {Array.<goog.ui.Component>?}
+ * @type {Array.< ZH.ui.LiveComponent>?}
  * @private
  */
-goog.ui.Component.prototype.children_ = null;
+ ZH.ui.LiveComponent.prototype.children_ = null;
 
 
 /**
@@ -370,14 +382,14 @@ goog.ui.Component.prototype.children_ = null;
  * private and must not be accessed directly outside of this class!
  *
  * We use a plain Object, not a {@link goog.structs.Map}, for simplicity.
- * This means components can't have children with IDs such as 'constructor' or
+ * This means components can't have children with IDs such as 'constructor'or
  * 'valueOf', but this shouldn't really be an issue in practice, and if it is,
  * we can always fix it later without changing the API.
  *
  * @type {Object}
  * @private
  */
-goog.ui.Component.prototype.childIndex_ = null;
+ ZH.ui.LiveComponent.prototype.childIndex_ = null;
 
 
 /**
@@ -392,7 +404,7 @@ goog.ui.Component.prototype.childIndex_ = null;
  * @type {boolean}
  * @private
  */
-goog.ui.Component.prototype.wasDecorated_ = false;
+ ZH.ui.LiveComponent.prototype.wasDecorated_ = false;
 
 
 /**
@@ -400,15 +412,15 @@ goog.ui.Component.prototype.wasDecorated_ = false;
  * side.
  * @return {string} Unique component ID.
  */
-goog.ui.Component.prototype.getId = function() {
-  return this.id_ 
+ ZH.ui.LiveComponent.prototype.getId = function() {
+  return this.id_
 };
 
 /**
  * Gets the component's element.
  * @return {Element} The element for the component.
  */
-goog.ui.Component.prototype.getElement = function() {
+ ZH.ui.LiveComponent.prototype.getElement = function() {
   // return this.element_;
   return this.getElementStrict()
 };
@@ -421,7 +433,7 @@ goog.ui.Component.prototype.getElement = function() {
  * assertion is enabled).
  * @return {!Element} The element for the component.
  */
-goog.ui.Component.prototype.getElementStrict = function() {
+ ZH.ui.LiveComponent.prototype.getElementStrict = function() {
   var el = this.element_;
   goog.asserts.assert(
       el, 'Can not call getElementStrict before rendering/decorating.');
@@ -441,7 +453,7 @@ goog.ui.Component.prototype.getElementStrict = function() {
  *
  * @param {Element} element Root element for the component.
  */
-goog.ui.Component.prototype.setElementInternal = function(element) {
+ ZH.ui.LiveComponent.prototype.setElementInternal = function(element) {
   this.element_ = element;
 };
 
@@ -452,7 +464,7 @@ goog.ui.Component.prototype.setElementInternal = function(element) {
  * @param {string} className The name of the class to look for.
  * @return {!goog.array.ArrayLike} The items found with the class name provided.
  */
-goog.ui.Component.prototype.getElementsByClass = function(className) {
+ ZH.ui.LiveComponent.prototype.getElementsByClass = function(className) {
   return this.element_ ?
       this.dom_.getElementsByClass(className, this.element_) : [];
 };
@@ -464,7 +476,7 @@ goog.ui.Component.prototype.getElementsByClass = function(className) {
  * @param {string} className The name of the class to look for.
  * @return {Element} The first item with the class name provided.
  */
-goog.ui.Component.prototype.getElementByClass = function(className) {
+ ZH.ui.LiveComponent.prototype.getElementByClass = function(className) {
   return this.element_ ?
       this.dom_.getElementByClass(className, this.element_) : null;
 };
@@ -477,7 +489,7 @@ goog.ui.Component.prototype.getElementByClass = function(className) {
  * @param {string} className The name of the class to look for.
  * @return {!Element} The first item with the class name provided.
  */
-goog.ui.Component.prototype.getRequiredElementByClass = function(className) {
+ ZH.ui.LiveComponent.prototype.getRequiredElementByClass = function(className) {
   var el = this.getElementByClass(className);
   goog.asserts.assert(el, 'Expected element in component with class: %s',
       className);
@@ -491,7 +503,7 @@ goog.ui.Component.prototype.getRequiredElementByClass = function(className) {
  * @return {!goog.events.EventHandler} Event handler for this component.
  * @protected
  */
-goog.ui.Component.prototype.getHandler = function() {
+ ZH.ui.LiveComponent.prototype.getHandler = function() {
   return this.googUiComponentHandler_ ||
          (this.googUiComponentHandler_ = new goog.events.EventHandler(this));
 };
@@ -503,33 +515,33 @@ goog.ui.Component.prototype.getHandler = function() {
  * component to itself as a child.  Callers must use {@code removeChild}
  * or {@code removeChildAt} to remove components from their containers before
  * calling this method.
- * @see goog.ui.Component#removeChild
- * @see goog.ui.Component#removeChildAt
- * @param {goog.ui.Component} parent The parent component.
+ * @see  ZH.ui.LiveComponent#removeChild
+ * @see  ZH.ui.LiveComponent#removeChildAt
+ * @param { ZH.ui.LiveComponent} parent The parent component.
  */
-goog.ui.Component.prototype.setParent = function(parent) {
-  if (this == parent) {
+ ZH.ui.LiveComponent.prototype.setParent = function(parent) {
+  if (this === parent) {
     // Attempting to add a child to itself is an error.
-    throw Error(goog.ui.Component.Error.PARENT_UNABLE_TO_BE_SET);
+    throw new Error( ZH.ui.LiveComponent.Error.PARENT_UNABLE_TO_BE_SET);
   }
 
   if (parent && this.parent_ && this.id_ && this.parent_.getChild(this.id_) &&
-      this.parent_ != parent) {
+      this.parent_ !== parent) {
     // This component is already the child of some parent, so it should be
     // removed using removeChild/removeChildAt first.
-    throw Error(goog.ui.Component.Error.PARENT_UNABLE_TO_BE_SET);
+    throw new Error( ZH.ui.LiveComponent.Error.PARENT_UNABLE_TO_BE_SET);
   }
 
   this.parent_ = parent;
-  goog.ui.Component.superClass_.setParentEventTarget.call(this, parent);
+   ZH.ui.LiveComponent.superClass_.setParentEventTarget.call(this, parent);
 };
 
 
 /**
  * Returns the component's parent, if any.
- * @return {goog.ui.Component?} The parent component.
+ * @return { ZH.ui.LiveComponent?} The parent component.
  */
-goog.ui.Component.prototype.getParent = function() {
+ ZH.ui.LiveComponent.prototype.getParent = function() {
   return this.parent_;
 };
 
@@ -539,11 +551,11 @@ goog.ui.Component.prototype.getParent = function() {
  * error if the parent component is set, and the argument is not the parent.
  * @override
  */
-goog.ui.Component.prototype.setParentEventTarget = function(parent) {
-  if (this.parent_ && this.parent_ != parent) {
-    throw Error(goog.ui.Component.Error.NOT_SUPPORTED);
+ ZH.ui.LiveComponent.prototype.setParentEventTarget = function(parent) {
+  if (this.parent_ && this.parent_ !== parent) {
+    throw new Error( ZH.ui.LiveComponent.Error.NOT_SUPPORTED);
   }
-  goog.ui.Component.superClass_.setParentEventTarget.call(this, parent);
+   ZH.ui.LiveComponent.superClass_.setParentEventTarget.call(this, parent);
 };
 
 
@@ -551,7 +563,7 @@ goog.ui.Component.prototype.setParentEventTarget = function(parent) {
  * Returns the dom helper that is being used on this component.
  * @return {!goog.dom.DomHelper} The dom helper used on this component.
  */
-goog.ui.Component.prototype.getDomHelper = function() {
+ ZH.ui.LiveComponent.prototype.getDomHelper = function() {
   return this.dom_;
 };
 
@@ -560,7 +572,7 @@ goog.ui.Component.prototype.getDomHelper = function() {
  * Determines whether the component has been added to the document.
  * @return {boolean} TRUE if rendered. Otherwise, FALSE.
  */
-goog.ui.Component.prototype.isInDocument = function() {
+ ZH.ui.LiveComponent.prototype.isInDocument = function() {
   return this.inDocument_;
 };
 
@@ -569,7 +581,7 @@ goog.ui.Component.prototype.isInDocument = function() {
  * Creates the initial DOM representation for the component.  The default
  * implementation is to set this.element_ = div.
  */
-goog.ui.Component.prototype.createDom = function() {
+ ZH.ui.LiveComponent.prototype.createDom = function() {
   this.element_ = this.dom_.createElement('div');
 };
 
@@ -589,7 +601,7 @@ goog.ui.Component.prototype.createDom = function() {
  * @param {Element=} opt_parentElement Optional parent element to render the
  *    component into.
  */
-goog.ui.Component.prototype.render = function(opt_parentElement) {
+ ZH.ui.LiveComponent.prototype.render = function(opt_parentElement) {
   this.render_(opt_parentElement);
 };
 
@@ -602,7 +614,7 @@ goog.ui.Component.prototype.render = function(opt_parentElement) {
  *
  * @param {Node} sibling Node to render the component before.
  */
-goog.ui.Component.prototype.renderBefore = function(sibling) {
+ ZH.ui.LiveComponent.prototype.renderBefore = function(sibling) {
   this.render_(/** @type {Element} */ (sibling.parentNode),
                sibling);
 };
@@ -626,10 +638,10 @@ goog.ui.Component.prototype.renderBefore = function(sibling) {
  *    be rendered.  If left out the node is appended to the parent element.
  * @private
  */
-goog.ui.Component.prototype.render_ = function(opt_parentElement,
+ ZH.ui.LiveComponent.prototype.render_ = function(opt_parentElement,
                                                opt_beforeNode) {
   if (this.inDocument_) {
-    throw Error(goog.ui.Component.Error.ALREADY_RENDERED);
+    throw new Error( ZH.ui.LiveComponent.Error.ALREADY_RENDERED);
   }
 
   if (!this.element_) {
@@ -657,20 +669,20 @@ goog.ui.Component.prototype.render_ = function(opt_parentElement,
  * Decorates the element for the UI component. If the element is in the
  * document, the enterDocument method will be called.
  *
- * If goog.ui.Component.ALLOW_DETACHED_DECORATION is false, the caller must
+ * If  ZH.ui.LiveComponent.ALLOW_DETACHED_DECORATION is false, the caller must
  * pass an element that is in the document.
  *
  * @param {Element} element Element to decorate.
  */
-goog.ui.Component.prototype.decorate = function(element) {
+ ZH.ui.LiveComponent.prototype.decorate = function(element) {
   if (this.inDocument_) {
-    throw Error(goog.ui.Component.Error.ALREADY_RENDERED);
+    throw new Error( ZH.ui.LiveComponent.Error.ALREADY_RENDERED);
   } else if (element && this.canDecorate(element)) {
     this.wasDecorated_ = true;
 
     // Set the DOM helper of the component to match the decorated element.
     var doc = goog.dom.getOwnerDocument(element);
-    if (!this.dom_ || this.dom_.getDocument() != doc) {
+    if (!this.dom_ || this.dom_.getDocument() !== doc) {
       this.dom_ = goog.dom.getDomHelper(element);
     }
 
@@ -678,12 +690,12 @@ goog.ui.Component.prototype.decorate = function(element) {
     this.decorateInternal(element);
 
     // If supporting detached decoration, check that element is in doc.
-    if (!goog.ui.Component.ALLOW_DETACHED_DECORATION ||
+    if (! ZH.ui.LiveComponent.ALLOW_DETACHED_DECORATION ||
         goog.dom.contains(doc, element)) {
       this.enterDocument();
     }
   } else {
-    throw Error(goog.ui.Component.Error.DECORATE_INVALID);
+    throw new Error( ZH.ui.LiveComponent.Error.DECORATE_INVALID);
   }
 };
 
@@ -694,7 +706,7 @@ goog.ui.Component.prototype.decorate = function(element) {
  * @param {Element} element Element to decorate.
  * @return {boolean} True if the element can be decorated, false otherwise.
  */
-goog.ui.Component.prototype.canDecorate = function(element) {
+ ZH.ui.LiveComponent.prototype.canDecorate = function(element) {
   return true;
 };
 
@@ -702,7 +714,7 @@ goog.ui.Component.prototype.canDecorate = function(element) {
 /**
  * @return {boolean} Whether the component was decorated.
  */
-goog.ui.Component.prototype.wasDecorated = function() {
+ ZH.ui.LiveComponent.prototype.wasDecorated = function() {
   return this.wasDecorated_;
 };
 
@@ -715,7 +727,7 @@ goog.ui.Component.prototype.wasDecorated = function() {
  * @param {Element} element Element to decorate.
  * @protected
  */
-goog.ui.Component.prototype.decorateInternal = function(element) {
+ ZH.ui.LiveComponent.prototype.decorateInternal = function(element) {
   this.element_ = element;
 };
 
@@ -727,12 +739,12 @@ goog.ui.Component.prototype.decorateInternal = function(element) {
  * If the component contains child components, this call is propagated to its
  * children.
  */
-goog.ui.Component.prototype.enterDocument = function() {
+ ZH.ui.LiveComponent.prototype.enterDocument = function() {
   this.inDocument_ = true;
 
   // Propagate enterDocument to child components that have a DOM, if any.
   // If a child was decorated before entering the document (permitted when
-  // goog.ui.Component.ALLOW_DETACHED_DECORATION is true), its enterDocument
+  //  ZH.ui.LiveComponent.ALLOW_DETACHED_DECORATION is true), its enterDocument
   // will be called here.
   this.forEachChild(function(child) {
     if (!child.isInDocument() && child.getElement()) {
@@ -753,7 +765,7 @@ goog.ui.Component.prototype.enterDocument = function() {
  * It should be possible for the component to be rendered again once this method
  * has been called.
  */
-goog.ui.Component.prototype.exitDocument = function() {
+ ZH.ui.LiveComponent.prototype.exitDocument = function() {
   // Propagate exitDocument to child components that have been rendered, if any.
   this.forEachChild(function(child) {
     if (child.isInDocument()) {
@@ -777,7 +789,7 @@ goog.ui.Component.prototype.exitDocument = function() {
  * @override
  * @protected
  */
-goog.ui.Component.prototype.disposeInternal = function() {
+ ZH.ui.LiveComponent.prototype.disposeInternal = function() {
   if (this.inDocument_) {
     this.exitDocument();
   }
@@ -803,7 +815,7 @@ goog.ui.Component.prototype.disposeInternal = function() {
   this.model_ = null;
   this.parent_ = null;
 
-  goog.ui.Component.superClass_.disposeInternal.call(this);
+   ZH.ui.LiveComponent.superClass_.disposeInternal.call(this);
 };
 
 
@@ -814,8 +826,8 @@ goog.ui.Component.prototype.disposeInternal = function() {
  * @param {string} idFragment A partial id.
  * @return {string} Unique element id.
  */
-goog.ui.Component.prototype.makeId = function(idFragment) {
-  return this.getId() + '.' + idFragment;
+ ZH.ui.LiveComponent.prototype.makeId = function(idFragment) {
+  return this.getId() + '.'+ idFragment;
 };
 
 
@@ -826,10 +838,12 @@ goog.ui.Component.prototype.makeId = function(idFragment) {
  * @param {Object} object The object that will be used to create the ids.
  * @return {Object} An object of id keys to generated ids.
  */
-goog.ui.Component.prototype.makeIds = function(object) {
+ ZH.ui.LiveComponent.prototype.makeIds = function(object) {
   var ids = {};
   for (var key in object) {
-    ids[key] = this.makeId(object[key]);
+    if (object.hasOwnProperty(key)) {
+      ids[key] = this.makeId(object[key]);
+    }
   }
   return ids;
 };
@@ -839,7 +853,7 @@ goog.ui.Component.prototype.makeIds = function(object) {
  * Returns the model associated with the UI component.
  * @return {*} The model.
  */
-goog.ui.Component.prototype.getModel = function() {
+ ZH.ui.LiveComponent.prototype.getModel = function() {
   return this.model_;
 };
 
@@ -848,8 +862,9 @@ goog.ui.Component.prototype.getModel = function() {
  * Sets the model associated with the UI component.
  * @param {*} obj The model.
  */
-goog.ui.Component.prototype.setModel = function(obj) {
+ ZH.ui.LiveComponent.prototype.setModel = function(obj) {
   this.model_ = obj;
+  this.dispatchEvent(ZH.ui.LiveComponent.EventType.ON_MODAL_UPDATE);
 };
 
 
@@ -859,7 +874,7 @@ goog.ui.Component.prototype.setModel = function(obj) {
  * @param {string} id Id generated with makeId().
  * @return {string} Fragment.
  */
-goog.ui.Component.prototype.getFragmentFromId = function(id) {
+ ZH.ui.LiveComponent.prototype.getFragmentFromId = function(id) {
   return id.substring(this.getId().length + 1);
 };
 
@@ -871,9 +886,9 @@ goog.ui.Component.prototype.getFragmentFromId = function(id) {
  * @return {Element} The element with the unique id, or null if it cannot be
  *     found.
  */
-goog.ui.Component.prototype.getElementByFragment = function(idFragment) {
+ ZH.ui.LiveComponent.prototype.getElementByFragment = function(idFragment) {
   if (!this.inDocument_) {
-    throw Error(goog.ui.Component.Error.NOT_IN_DOCUMENT);
+    throw new Error( ZH.ui.LiveComponent.Error.NOT_IN_DOCUMENT);
   }
   return this.dom_.getElement(this.makeId(idFragment));
 };
@@ -881,14 +896,14 @@ goog.ui.Component.prototype.getElementByFragment = function(idFragment) {
 
 /**
  * Adds the specified component as the last child of this component.  See
- * {@link goog.ui.Component#addChildAt} for detailed semantics.
+ * {@link  ZH.ui.LiveComponent#addChildAt} for detailed semantics.
  *
- * @see goog.ui.Component#addChildAt
- * @param {goog.ui.Component} child The new child component.
+ * @see  ZH.ui.LiveComponent#addChildAt
+ * @param { ZH.ui.LiveComponent} child The new child component.
  * @param {boolean=} opt_render If true, the child component will be rendered
  *    into the parent.
  */
-goog.ui.Component.prototype.addChild = function(child, opt_render) {
+ ZH.ui.LiveComponent.prototype.addChild = function(child, opt_render) {
   // TODO(gboyer): addChildAt(child, this.getChildCount(), false) will
   // reposition any already-rendered child to the end.  Instead, perhaps
   // addChild(child, false) should never reposition the child; instead, clients
@@ -934,24 +949,24 @@ goog.ui.Component.prototype.addChild = function(child, opt_render) {
  * Finally, this method also throws an error if the new child already has a
  * different parent, or the given index is out of bounds.
  *
- * @see goog.ui.Component#addChild
- * @param {goog.ui.Component} child The new child component.
+ * @see  ZH.ui.LiveComponent#addChild
+ * @param { ZH.ui.LiveComponent} child The new child component.
  * @param {number} index 0-based index at which the new child component is to be
  *    added; must be between 0 and the current child count (inclusive).
  * @param {boolean=} opt_render If true, the child component will be rendered
  *    into the parent.
  * @return {void} Nada.
  */
-goog.ui.Component.prototype.addChildAt = function(child, index, opt_render) {
+ ZH.ui.LiveComponent.prototype.addChildAt = function(child, index, opt_render) {
   if (child.inDocument_ && (opt_render || !this.inDocument_)) {
     // Adding a child that's already in the document is an error, except if the
     // parent is also in the document and opt_render is false (e.g. decorate()).
-    throw Error(goog.ui.Component.Error.ALREADY_RENDERED);
+    throw new Error( ZH.ui.LiveComponent.Error.ALREADY_RENDERED);
   }
 
   if (index < 0 || index > this.getChildCount()) {
     // Allowing sparse child arrays would lead to strange behavior, so we don't.
-    throw Error(goog.ui.Component.Error.CHILD_INDEX_OUT_OF_BOUNDS);
+    throw new Error( ZH.ui.LiveComponent.Error.CHILD_INDEX_OUT_OF_BOUNDS);
   }
 
   // Create the index and the child array on first use.
@@ -961,7 +976,7 @@ goog.ui.Component.prototype.addChildAt = function(child, index, opt_render) {
   }
 
   // Moving child within component, remove old reference.
-  if (child.getParent() == this) {
+  if (child.getParent() === this) {
     goog.object.set(this.childIndex_, child.getId(), child);
     goog.array.remove(this.children_, child);
 
@@ -976,7 +991,40 @@ goog.ui.Component.prototype.addChildAt = function(child, index, opt_render) {
   child.setParent(this);
   goog.array.insertAt(this.children_, child, index);
 
-  
+  if (child.inDocument_ && this.inDocument_ && child.getParent() === this && this.options.maintainChildDomIndex) {
+    // Changing the position of an existing child, move the DOM node.
+    var contentElement = this.getContentElement();
+    contentElement.insertBefore(child.getElement(),
+        (contentElement.childNodes[index] || null));
+
+  } else if (opt_render) {
+    // If this (parent) component doesn't have a DOM yet, call createDom now
+    // to make sure we render the child component's element into the correct
+    // parent element (otherwise render_ with a null first argument would
+    // render the child into the document body, which is almost certainly not
+    // what we want).
+    if (!this.element_) {
+      this.createDom();
+    }
+    // Render the child into the parent at the appropriate location.  Note that
+    // getChildAt(index + 1) returns undefined if inserting at the end.
+    // TODO(attila): We should have a renderer with a renderChildAt API.
+    var sibling = this.getChildAt(index + 1);
+    // render_() calls enterDocument() if the parent is already in the document.
+    child.render_(this.getContentElement(), sibling ? sibling.element_ : null);
+  } else if (this.inDocument_ && !child.inDocument_ && child.element_ &&
+      child.element_.parentNode &&
+      // Under some circumstances, IE8 implicitly creates a Document Fragment
+      // for detached nodes, so ensure the parent is an Element as it should be.
+      child.element_.parentNode.nodeType === goog.dom.NodeType.ELEMENT) {
+    // We don't touch the DOM, but if the parent is in the document, and the
+    // child element is in the document but not marked as such, then we call
+    // enterDocument on the child.
+    // TODO(gboyer): It would be nice to move this condition entirely, but
+    // there's a large risk of breaking existing applications that manually
+    // append the child to the DOM and then call addChild.
+    child.enterDocument();
+  }
 };
 
 
@@ -987,7 +1035,7 @@ goog.ui.Component.prototype.addChildAt = function(child, index, opt_render) {
  * complex DOM structures must override this method.
  * @return {Element} Element to contain child elements (null if none).
  */
-goog.ui.Component.prototype.getContentElement = function() {
+ ZH.ui.LiveComponent.prototype.getContentElement = function() {
   return this.element_;
 };
 
@@ -996,8 +1044,8 @@ goog.ui.Component.prototype.getContentElement = function() {
  * Returns true if the component has children.
  * @return {boolean} True if the component has children.
  */
-goog.ui.Component.prototype.hasChildren = function() {
-  return !!this.children_ && this.children_.length != 0;
+ ZH.ui.LiveComponent.prototype.hasChildren = function() {
+  return !!this.children_ && this.children_.length !== 0;
 };
 
 
@@ -1005,7 +1053,7 @@ goog.ui.Component.prototype.hasChildren = function() {
  * Returns the number of children of this component.
  * @return {number} The number of children.
  */
-goog.ui.Component.prototype.getChildCount = function() {
+ ZH.ui.LiveComponent.prototype.getChildCount = function() {
   return this.children_ ? this.children_.length : 0;
 };
 
@@ -1015,7 +1063,7 @@ goog.ui.Component.prototype.getChildCount = function() {
  * empty array if the component has no children.
  * @return {Array.<string>} Child component IDs.
  */
-goog.ui.Component.prototype.getChildIds = function() {
+ ZH.ui.LiveComponent.prototype.getChildIds = function() {
   var ids = [];
 
   // We don't use goog.object.getKeys(this.childIndex_) because we want to
@@ -1032,11 +1080,11 @@ goog.ui.Component.prototype.getChildIds = function() {
 /**
  * Returns the child with the given ID, or null if no such child exists.
  * @param {string} id Child component ID.
- * @return {goog.ui.Component?} The child with the given ID; null if none.
+ * @return { ZH.ui.LiveComponent?} The child with the given ID; null if none.
  */
-goog.ui.Component.prototype.getChild = function(id) {
+ ZH.ui.LiveComponent.prototype.getChild = function(id) {
   // Use childIndex_ for O(1) access by ID.
-  return (this.childIndex_ && id) ? /** @type {goog.ui.Component} */ (
+  return (this.childIndex_ && id) ? /** @type { ZH.ui.LiveComponent} */ (
       goog.object.get(this.childIndex_, id)) || null : null;
 };
 
@@ -1044,9 +1092,9 @@ goog.ui.Component.prototype.getChild = function(id) {
 /**
  * Returns the child at the given index, or null if the index is out of bounds.
  * @param {number} index 0-based index.
- * @return {goog.ui.Component?} The child at the given index; null if none.
+ * @return { ZH.ui.LiveComponent?} The child at the given index; null if none.
  */
-goog.ui.Component.prototype.getChildAt = function(index) {
+ ZH.ui.LiveComponent.prototype.getChildAt = function(index) {
   // Use children_ for access by index.
   return this.children_ ? this.children_[index] || null : null;
 };
@@ -1054,15 +1102,15 @@ goog.ui.Component.prototype.getChildAt = function(index) {
 
 /**
  * Calls the given function on each of this component's children in order.  If
- * {@code opt_obj} is provided, it will be used as the 'this' object in the
+ * {@code opt_obj} is provided, it will be used as the 'this'object in the
  * function when called.  The function should take two arguments:  the child
  * component and its 0-based index.  The return value is ignored.
  * @param {function(this:T,?,number):?} f The function to call for every
  * child component; should take 2 arguments (the child and its index).
- * @param {T=} opt_obj Used as the 'this' object in f when called.
+ * @param {T=} opt_obj Used as the 'this'object in f when called.
  * @template T
  */
-goog.ui.Component.prototype.forEachChild = function(f, opt_obj) {
+ ZH.ui.LiveComponent.prototype.forEachChild = function(f, opt_obj) {
   if (this.children_) {
     goog.array.forEach(this.children_, f, opt_obj);
   }
@@ -1072,10 +1120,10 @@ goog.ui.Component.prototype.forEachChild = function(f, opt_obj) {
 /**
  * Returns the 0-based index of the given child component, or -1 if no such
  * child is found.
- * @param {goog.ui.Component?} child The child component.
+ * @param { ZH.ui.LiveComponent?} child The child component.
  * @return {number} 0-based index of the child component; -1 if not found.
  */
-goog.ui.Component.prototype.indexOfChild = function(child) {
+ ZH.ui.LiveComponent.prototype.indexOfChild = function(child) {
   return (this.children_ && child) ? goog.array.indexOf(this.children_, child) :
       -1;
 };
@@ -1087,19 +1135,19 @@ goog.ui.Component.prototype.indexOfChild = function(child) {
  * parent component.  The argument can either be a string (interpreted as the
  * ID of the child component to remove) or the child component itself.
  *
- * If {@code opt_unrender} is true, calls {@link goog.ui.component#exitDocument}
+ * If {@code opt_unrender} is true, calls {@link  ZH.ui.LiveComponent#exitDocument}
  * on the removed child, and subsequently detaches the child's DOM from the
  * document.  Otherwise it is the caller's responsibility to clean up the child
  * component's DOM.
  *
- * @see goog.ui.Component#removeChildAt
- * @param {string|goog.ui.Component|null} child The ID of the child to remove,
+ * @see  ZH.ui.LiveComponent#removeChildAt
+ * @param {string| ZH.ui.LiveComponent|null} child The ID of the child to remove,
  *    or the child component itself.
  * @param {boolean=} opt_unrender If true, calls {@code exitDocument} on the
  *    removed child component, and detaches its DOM from the document.
- * @return {goog.ui.Component} The removed component, if any.
+ * @return { ZH.ui.LiveComponent} The removed component, if any.
  */
-goog.ui.Component.prototype.removeChild = function(child, opt_unrender) {
+ ZH.ui.LiveComponent.prototype.removeChild = function(child, opt_unrender) {
   if (child) {
     // Normalize child to be the object and id to be the ID string.  This also
     // ensures that the child is really ours.
@@ -1126,27 +1174,27 @@ goog.ui.Component.prototype.removeChild = function(child, opt_unrender) {
   }
 
   if (!child) {
-    throw Error(goog.ui.Component.Error.NOT_OUR_CHILD);
+    throw new Error( ZH.ui.LiveComponent.Error.NOT_OUR_CHILD);
   }
 
-  return /** @type {goog.ui.Component} */(child);
+  return /** @type { ZH.ui.LiveComponent} */(child);
 };
 
 
 /**
  * Removes the child at the given index from this component, and returns it.
  * Throws an error if the argument is out of bounds, or if the specified child
- * isn't found in the parent.  See {@link goog.ui.Component#removeChild} for
+ * isn't found in the parent.  See {@link  ZH.ui.LiveComponent#removeChild} for
  * detailed semantics.
  *
- * @see goog.ui.Component#removeChild
+ * @see  ZH.ui.LiveComponent#removeChild
  * @param {number} index 0-based index of the child to remove.
  * @param {boolean=} opt_unrender If true, calls {@code exitDocument} on the
  *    removed child component, and detaches its DOM from the document.
- * @return {goog.ui.Component} The removed component, if any.
+ * @return { ZH.ui.LiveComponent} The removed component, if any.
  */
-goog.ui.Component.prototype.removeChildAt = function(index, opt_unrender) {
-  // removeChild(null) will throw error.
+ ZH.ui.LiveComponent.prototype.removeChildAt = function(index, opt_unrender) {
+  // removeChild(null) will throw new Error.
   return this.removeChild(this.getChildAt(index), opt_unrender);
 };
 
@@ -1154,15 +1202,187 @@ goog.ui.Component.prototype.removeChildAt = function(index, opt_unrender) {
 /**
  * Removes every child component attached to this one and returns them.
  *
- * @see goog.ui.Component#removeChild
+ * @see  ZH.ui.LiveComponent#removeChild
  * @param {boolean=} opt_unrender If true, calls {@link #exitDocument} on the
  *    removed child components, and detaches their DOM from the document.
- * @return {!Array.<goog.ui.Component>} The removed components if any.
+ * @return {!Array.< ZH.ui.LiveComponent>} The removed components if any.
  */
-goog.ui.Component.prototype.removeChildren = function(opt_unrender) {
+ ZH.ui.LiveComponent.prototype.removeChildren = function(opt_unrender) {
   var removedChildren = [];
   while (this.hasChildren()) {
     removedChildren.push(this.removeChildAt(0, opt_unrender));
   }
   return removedChildren;
 };
+
+/* Bellow : my patch for component. */
+
+/**
+ * Type string
+ **/
+ ZH.ui.LiveComponent.prototype.typeString_ = "ZH.ui.LiveComponent";
+
+
+ZH.ui.LiveComponent.prototype.getTypeString = function(){
+  return this.typeString_;
+};
+
+ZH.ui.LiveComponent.prototype.setId = function(clientIdentity){
+  this.id_ = clientIdentity;
+};
+
+ZH.ui.LiveComponent.prototype.exitDocument = function(){
+    ZH.core.Registry.getInstance().unRegistInstance(this.typeString_, this.getIdentity());
+    goog.base(this, 'exitDocument');
+};
+
+ZH.ui.LiveComponent.prototype.getLastAction = function(){
+    return this.currentAction_;
+};
+
+//when we need some check before a request, ig, a confirm dialog, after confirmed
+//we can resend this reqest: ZH.net.RequestManager.getInstance().send(component.getLastRequest());
+ZH.ui.LiveComponent.prototype.getLastRequest = function(){
+    return this.lastRequest_;
+};
+
+//live updatable component should IMP this interface.
+ZH.ui.LiveComponent.prototype.liveUpdate = function(htmlString, opt_modal){
+    if (!htmlString) {
+      throw new Error('Invalid html provided.')
+    }
+    
+    if (this.dispatchEvent(ZH.ui.LiveComponent.EventType.ON_LIVE_UPDATED)) {
+        // Disposes of the component's children, if any.
+      this.forEachChild(function(child) {
+        child.dispose();
+      });
+
+      this.children_ = null;
+      this.childIndex_ = null;
+      this.model_ = null;
+        
+      if (this.googUiComponentHandler_) {
+        this.googUiComponentHandler_.dispose();
+        delete this.googUiComponentHandler_;
+      }
+      
+      // NOTE: htmlString should be trim.
+      var newElement = this.dom_.htmlToDocumentFragment(htmlString);
+      //IMPORTANAT: if this is not a element but documentFragment node.
+      //Normally, any extra line break or comments outside 
+      //element's html code should be stripped in template.
+      if(newElement.nodeType !== 1 && newElement.childNodes){
+          newElement = goog.array.find(newElement.childNodes, function(el){
+              //return firt element node.
+              return el.nodeType === 1;
+          });
+      }
+      
+      //this.dom_.insertSiblingAfter(newElement, this.getElement());
+      this.dom_.replaceNode(newElement, this.element_);
+      
+      //parent should be preserved.
+      //var tempParent = this.parent_;
+      //We can't dispose current instance, becase base class event target will also be disposed.
+      //this.dispose();
+      //this.parent_ = tempParent;
+      //restore decorate status.
+      this.wasDecorated_ = false;
+      this.inDocument_ = false;
+      
+      //re-init whole component.
+      this.decorate(newElement);
+      
+      if (opt_modal) {
+        this.setModel(opt_modal)
+      }
+
+      this.dispatchEvent(ZH.ui.LiveComponent.EventType.LIVE_UPDATED)
+    }
+    
+};
+
+/** Subclass could override this method to receive any message. */
+ZH.ui.LiveComponent.prototype.onLiveMessage = function(message){
+  this.dispatchEvent(ZH.ui.LiveComponent.EventType.ON_LIVE_MESSAGE)
+}
+
+ZH.ui.LiveComponent.prototype.findChildByType = function(typeString, opt_isDeep){
+    var c = goog.array.find(this.children_, function(child){
+        return child.typeString_ === typeString;
+    });
+    if(c){
+        return c;
+    }else if(opt_isDeep){
+        var len = this.children_.length;
+        for(var i=0;i<len;i++){
+            var child = this.children_[i];
+            if(child){
+                c = this.children_[i].findChildByType(typeString, true);
+                if(c){
+                    return c;
+                }
+            }
+        }
+    }
+};
+
+ZH.ui.LiveComponent.prototype.findChildByName = function(childName, opt_isDeep){
+    var c = goog.array.find(this.children_, function(child){
+        return child.getMeta('instance_name') === childName;
+    });
+    
+    if(c){
+        return c;
+    }else if(opt_isDeep){
+        var len = this.children_.length;
+        for(var i=0;i<len;i++){
+            var child = this.children_[i];
+            if(child){
+                c = this.children_[i].findChildByName(childName, true);
+                if(c){
+                    return c;
+                }
+            }
+        }
+    }
+};
+
+ZH.ui.LiveComponent.prototype.findChildsByType = function(typeString){
+    var childs_ = [];
+    goog.array.forEach(this.children_, function(c){
+        if(c.typeString_ === typeString){
+            childs_.push(c);
+        }
+    });
+    return childs_;
+};
+
+
+
+ZH.core.Registry.getInstance().regist(ZH.ui.LiveComponent.RAW_TYPE_STRING, ZH.ui.LiveComponent);
+
+
+/**
+ * @constructor
+ */
+ZH.ui.LiveComponent.ActionEvent = function(actionType, request, opt_event){
+    this.type = ZH.ui.LiveComponent.EventType.ACTION;
+    this.actionType = actionType;
+    this.request_ = request;
+    //Button click event.
+    this.optEvent = opt_event;
+};
+
+goog.inherits(ZH.ui.LiveComponent.ActionEvent, goog.events.Event);
+
+ZH.ui.LiveComponent.ActionEvent.prototype.getRequest = function(){
+    return this.request_;
+};
+
+
+
+
+
+

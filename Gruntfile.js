@@ -38,7 +38,10 @@ module.exports = function(grunt) {
       // In this example, there's only one, but you can add as many as
       // you want. You can split them up into different groups here
       // ex: admin: [ 'test/admin.html' ]
-      all: [ 'test/**/*.html' ]
+      all: [ 'test/**/*.html' ],
+      options: {
+        reporter: 'Nyan'
+      }
     },
     // connect: {
     //   server: {
@@ -92,6 +95,16 @@ module.exports = function(grunt) {
 
       }
     },
+    jshint: {
+      files: {
+        src: [
+          'src/**/*.js'
+        ],
+        options: {
+          jshintrc: 'src/.jshintrc'
+        }
+      }
+    },
     copy: {
       mocha: {
         files: [
@@ -116,7 +129,6 @@ module.exports = function(grunt) {
     }
   });
 
-
   grunt.loadNpmTasks('grunt-contrib-jade');
   grunt.loadNpmTasks('grunt-closure-tools');
   grunt.loadNpmTasks('grunt-contrib-connect');
@@ -139,7 +151,7 @@ module.exports = function(grunt) {
   grunt.registerTask('dev_server', ['connect:dev_server']);
 
   // Default task(s).
-  grunt.registerTask('default', ['less', 'jade']);
+  grunt.registerTask('default', ['jshint', 'mocha', 'less', 'jade']);
   // grunt.registerTask('default', ['uglify']);
   // grunt.registerTask('server', ['server']);
 };

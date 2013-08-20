@@ -4,7 +4,9 @@
   "description": "Html5 based page block rendering engine.",
   "version": "0.0.1",
   "keywords": [],
-  "dependencies": {},
+  "dependencies": {
+    "closure-library": "*"
+  },
   "development": {},
   "license": "MIT",
   "main": "index.js",

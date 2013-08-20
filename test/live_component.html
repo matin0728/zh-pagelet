@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="css/mocha.css" type="text/css" charset="utf-8" />
 </head>
 <body>
+    <div id="sample"></div>
     <!-- Required for browser reporter -->
     <div id="mocha"></div>
 
@@ -13,7 +14,7 @@
     <script src="js/mocha.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript" charset="utf-8">
         // This will be overridden by mocha-helper if you run with grunt
-        mocha.setup('tdd');
+        mocha.setup('bdd');
     </script>
 
     <!--
@@ -32,13 +33,25 @@
     </script>
 
     <!-- Include anything you want to test -->
+    <script src="../vendor/closure-library/closure/goog/base.js"></script>
     <script src="../src/deps.js"></script>
+
+    <script>
+        goog.require('goog.array');
+        goog.require('goog.asserts');
+        goog.require('goog.dom');
+        goog.require('goog.dom.NodeType');
+        goog.require('goog.events.EventHandler');
+        goog.require('goog.events.EventTarget');
+        goog.require('goog.object');
+        goog.require('goog.style');
+        goog.require('goog.ui.IdGenerator');
+    </script>
+    
     <script src="../src/live_component.js" type="text/javascript" charset="utf-8"></script>
-    <script src="js/wombat.js" type="text/javascript" charset="utf-8"></script>
 
     <!-- Spec files -->
-    <script src="spec/wombat.js" type="text/javascript" charset="utf-8"></script>
-    <script src="spec/apple.js" type="text/javascript" charset="utf-8"></script>
+    <script src="spec/live_component.js"></script>
 
     <!-- run mocha -->
     <script type="text/javascript" charset="utf-8">
