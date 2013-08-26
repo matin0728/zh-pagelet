@@ -62,7 +62,7 @@ module.exports = function(grunt) {
     },
     closureDepsWriter: {
       options: {
-        closureLibraryPath: 'vendor/google-closure-library',
+        closureLibraryPath: 'vendor/closure-library',
         root_with_prefix: '"src ../../../../src"'
       },
       standalone: {
@@ -151,7 +151,7 @@ module.exports = function(grunt) {
   grunt.registerTask('dev_server', ['connect:dev_server']);
 
   // Default task(s).
-  grunt.registerTask('default', ['jshint', 'mocha', 'less', 'jade']);
+  grunt.registerTask('default', ['jshint', 'closureDepsWriter:standalone', 'mocha', 'less', 'jade']);
   // grunt.registerTask('default', ['uglify']);
   // grunt.registerTask('server', ['server']);
 };

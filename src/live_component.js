@@ -18,6 +18,7 @@ goog.require('goog.events.EventTarget');
 goog.require('goog.object');
 goog.require('goog.style');
 goog.require('goog.ui.IdGenerator');
+goog.require('goog.structs.Map');
 goog.require('ZH.core.Registry');
 
 
@@ -29,10 +30,10 @@ goog.require('ZH.core.Registry');
  * @constructor
  * @extends {goog.events.EventTarget}
  */
- ZH.ui.LiveComponent = function(opt_options, opt_domHelper) {
+ ZH.ui.LiveComponent = function(opt_meta, opt_domHelper) {
   goog.events.EventTarget.call(this);
   this.dom_ = opt_domHelper || goog.dom.getDomHelper();
-  this.options = goog.object.extend(this.defaults, opt_options || {});
+  this.metaData_ = new goog.structs.Map(goog.object.extend(this.defaultMetaData_, opt_meta || {}));
 };
 goog.inherits( ZH.ui.LiveComponent, goog.events.EventTarget);
 
@@ -292,7 +293,7 @@ goog.define('ZH.ui.LiveComponent.ALLOW_DETACHED_DECORATION', false);
  * @type {?Object}
  * @private
  */
- ZH.ui.LiveComponent.prototype.defaults = {
+ ZH.ui.LiveComponent.prototype.defaultMetaData_ = {
   //Dont move child on adding, case child may in diff dom level, if this
   //is a container, and all childs is the same type, set this option to 
   //true on demond.
@@ -1249,7 +1250,7 @@ ZH.ui.LiveComponent.prototype.getLastRequest = function(){
 //live updatable component should IMP this interface.
 ZH.ui.LiveComponent.prototype.liveUpdate = function(htmlString, opt_modal){
     if (!htmlString) {
-      throw new Error('Invalid html provided.')
+      throw new Error('Invalid html for liveupdate.')
     }
     
     if (this.dispatchEvent(ZH.ui.LiveComponent.EventType.ON_LIVE_UPDATED)) {
@@ -1326,6 +1327,24 @@ ZH.ui.LiveComponent.prototype.findChildByType = function(typeString, opt_isDeep)
             }
         }
     }
+};
+
+/**
+ * Get the whole meta data Map.
+ **/
+ZH.ui.LiveComponent.prototype.getMyMeta = function() {
+  return this.metaData_
+};
+
+/**
+ * Find meta via parent-child chain.
+ **/
+ZH.ui.LiveComponent.prototype.getMeta = function(key){
+  if (this.metaData_.containsKey(key)) {
+    return this.metaData_.get(key)
+  } else if (this.parent_) {
+    return this.parent_.getMeta(key)
+  }
 };
 
 ZH.ui.LiveComponent.prototype.findChildByName = function(childName, opt_isDeep){
