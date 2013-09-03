@@ -112,16 +112,18 @@ module.exports = function(grunt) {
             expand: true,
             flatten: true,
             src: [
-              'node_modules/grunt-mocha/example/test/js/mocha.js',
-              'node_modules/grunt-mocha/example/test/js/chai.js',
+              'node_modules/mocha/mocha.js',
+              'node_modules/chai/chai.js',
+              'node_modules/sinon-chai/lib/sinon-chai.js',
               'node_modules/grunt-mocha/phantomjs/bridge.js',
+              'node_modules/sinon/pkg/sinon.js'
             ],
             dest: 'test/js/',
           },
           {
             expand: true,
             flatten: true,
-            src: 'node_modules/grunt-mocha/example/test/css/mocha.css',
+            src: 'node_modules/mocha/mocha.css',
             dest: 'test/css/',
           }
         ]

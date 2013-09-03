@@ -133,7 +133,8 @@ ZH.core.Registry.prototype.getInstanceByDomId = function(domId) {
       return
     }
     var a = domId.split('-')
-    return this.getInstanceById(a[0], a[1]);
+    // ID: lc-[typeString]-[uniqueID]
+    return this.getInstanceById(a[1], a[2]);
 };
 
 

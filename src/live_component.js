@@ -20,6 +20,7 @@ goog.require('goog.style');
 goog.require('goog.ui.IdGenerator');
 goog.require('goog.structs.Map');
 goog.require('ZH.core.Registry');
+goog.require('ZH.core.uti');
 
 
 
@@ -30,10 +31,35 @@ goog.require('ZH.core.Registry');
  * @constructor
  * @extends {goog.events.EventTarget}
  */
- ZH.ui.LiveComponent = function(opt_meta, opt_domHelper) {
+ ZH.ui.LiveComponent = function(opt_meta, opt_options, opt_domHelper) {
   goog.events.EventTarget.call(this);
   this.dom_ = opt_domHelper || goog.dom.getDomHelper();
-  this.metaData_ = new goog.structs.Map(goog.object.extend(this.defaultMetaData_, opt_meta || {}));
+  
+  var options = goog.object.clone(this.defaults_)
+  goog.object.extend(options, opt_options || {})
+  this.options = options
+
+  this.meta = opt_meta || {}
+
+  /**
+   * Map of class id to registered plugin.
+   * @type {Object}
+   * @private
+   */
+  this.plugins_ = {}
+
+  /**
+   * Plugins registered on this field, indexed by the ZH.core.LiveComponentPlugin.Op
+   * that they support.
+   * @type {Object.<Array>}
+   * @private
+   */
+  this.indexedPlugins_ = {};
+
+  for (var op in ZH.core.LiveComponentPlugin.OPCODE) {
+    this.indexedPlugins_[op] = [];
+  }
+
 };
 goog.inherits( ZH.ui.LiveComponent, goog.events.EventTarget);
 
@@ -128,7 +154,9 @@ goog.define('ZH.ui.LiveComponent.ALLOW_DETACHED_DECORATION', false);
   ACTION: 'action',
 
   /** Dispatched after the external-facing state of a component is changed. */
-  CHANGE: 'change'
+  CHANGE: 'change',
+
+  BEFORE_CHANGE: 'before_change'
 };
 
 
@@ -293,11 +321,13 @@ goog.define('ZH.ui.LiveComponent.ALLOW_DETACHED_DECORATION', false);
  * @type {?Object}
  * @private
  */
- ZH.ui.LiveComponent.prototype.defaultMetaData_ = {
+ ZH.ui.LiveComponent.prototype.defaults_ = {
   //Dont move child on adding, case child may in diff dom level, if this
   //is a container, and all childs is the same type, set this option to 
   //true on demond.
-  maintainChildDomIndex: false
+  maintainChildDomIndex: false,
+  //listen on this.element_ as delegate.
+  addDefaultEventListener: false
  };
 
 
@@ -730,6 +760,9 @@ goog.define('ZH.ui.LiveComponent.ALLOW_DETACHED_DECORATION', false);
  */
  ZH.ui.LiveComponent.prototype.decorateInternal = function(element) {
   this.element_ = element;
+  if (this.options.addDefaultEventListener) {
+    this.getHandler().listen(this.element_, goog.events.EventType.CLICK, this.onActionButtonClick_)
+  }
 };
 
 
@@ -1232,18 +1265,18 @@ ZH.ui.LiveComponent.prototype.setId = function(clientIdentity){
   this.id_ = clientIdentity;
 };
 
-ZH.ui.LiveComponent.prototype.exitDocument = function(){
+ZH.ui.LiveComponent.prototype.exitDocument = function() {
     ZH.core.Registry.getInstance().unRegistInstance(this.typeString_, this.getIdentity());
     goog.base(this, 'exitDocument');
 };
 
-ZH.ui.LiveComponent.prototype.getLastAction = function(){
+ZH.ui.LiveComponent.prototype.getLastAction = function() {
     return this.currentAction_;
 };
 
 //when we need some check before a request, ig, a confirm dialog, after confirmed
 //we can resend this reqest: ZH.net.RequestManager.getInstance().send(component.getLastRequest());
-ZH.ui.LiveComponent.prototype.getLastRequest = function(){
+ZH.ui.LiveComponent.prototype.getLastRequest = function() {
     return this.lastRequest_;
 };
 
@@ -1269,11 +1302,11 @@ ZH.ui.LiveComponent.prototype.liveUpdate = function(htmlString, opt_modal){
       }
       
       // NOTE: htmlString should be trim.
-      var newElement = this.dom_.htmlToDocumentFragment(htmlString);
+      var newElement = this.dom_.htmlToDocumentFragment(ZH.core.uti.trim(htmlString));
       //IMPORTANAT: if this is not a element but documentFragment node.
       //Normally, any extra line break or comments outside 
       //element's html code should be stripped in template.
-      if(newElement.nodeType !== 1 && newElement.childNodes){
+      if(newElement.nodeType !== 1 && newElement.childNodes) {
           newElement = goog.array.find(newElement.childNodes, function(el){
               //return firt element node.
               return el.nodeType === 1;
@@ -1305,43 +1338,60 @@ ZH.ui.LiveComponent.prototype.liveUpdate = function(htmlString, opt_modal){
 };
 
 /** Subclass could override this method to receive any message. */
-ZH.ui.LiveComponent.prototype.onLiveMessage = function(message){
+ZH.ui.LiveComponent.prototype.onLiveMessage = function(message) {
   this.dispatchEvent(ZH.ui.LiveComponent.EventType.ON_LIVE_MESSAGE)
 }
 
-ZH.ui.LiveComponent.prototype.findChildByType = function(typeString, opt_isDeep){
-    var c = goog.array.find(this.children_, function(child){
-        return child.typeString_ === typeString;
-    });
-    if(c){
-        return c;
-    }else if(opt_isDeep){
-        var len = this.children_.length;
-        for(var i=0;i<len;i++){
-            var child = this.children_[i];
-            if(child){
-                c = this.children_[i].findChildByType(typeString, true);
-                if(c){
-                    return c;
-                }
-            }
-        }
+ZH.ui.LiveComponent.prototype.findChildsByType = function(typeString, opt_isDeep){
+  var childs = []
+  this.forEachChild(function(child) {
+    if (child.getTypeString() === typeString) {
+      childs.push(child)
     }
+  }, this)
+
+  if (!opt_isDeep) {
+    return childs
+  } else {
+    var childsChilds = []
+    this.forEachChild(function(child) {
+      goog.array.extend(childsChilds, child.findChildsByType(typeString, opt_isDeep))
+    }, this)
+  }
+
+  goog.array.extend(childs, childsChilds)
+  return childs
 };
 
-/**
- * Get the whole meta data Map.
- **/
-ZH.ui.LiveComponent.prototype.getMyMeta = function() {
-  return this.metaData_
+ZH.ui.LiveComponent.prototype.findChildByType = function(typeString, opt_isDeep){
+  var result;
+  this.forEachChild(function(child) {
+    if (!result && child.getTypeString() === typeString) {
+      result = child
+    }
+  }, this)
+
+  if (result) {
+    return result
+  }
+
+  if (opt_isDeep) {
+    this.forEachChild(function(child) {
+      if (!result) {
+        result = child.findChildByType(typeString, true)
+      }
+    }, this)
+
+    return result
+  }
 };
 
 /**
  * Find meta via parent-child chain.
  **/
 ZH.ui.LiveComponent.prototype.getMeta = function(key){
-  if (this.metaData_.containsKey(key)) {
-    return this.metaData_.get(key)
+  if (this.meta[key]) {
+    return this.meta[key]
   } else if (this.parent_) {
     return this.parent_.getMeta(key)
   }
@@ -1349,14 +1399,14 @@ ZH.ui.LiveComponent.prototype.getMeta = function(key){
 
 ZH.ui.LiveComponent.prototype.findChildByName = function(childName, opt_isDeep){
     var c = goog.array.find(this.children_, function(child){
-        return child.getMeta('instance_name') === childName;
+        return child.meta.name === childName;
     });
     
     if(c){
         return c;
-    }else if(opt_isDeep){
+    }else if(opt_isDeep) {
         var len = this.children_.length;
-        for(var i=0;i<len;i++){
+        for(var i=0;i<len;i++) {
             var child = this.children_[i];
             if(child){
                 c = this.children_[i].findChildByName(childName, true);
@@ -1368,19 +1418,111 @@ ZH.ui.LiveComponent.prototype.findChildByName = function(childName, opt_isDeep){
     }
 };
 
-ZH.ui.LiveComponent.prototype.findChildsByType = function(typeString){
-    var childs_ = [];
-    goog.array.forEach(this.children_, function(c){
-        if(c.typeString_ === typeString){
-            childs_.push(c);
-        }
-    });
-    return childs_;
+ZH.ui.LiveComponent.prototype.dispatchBeforeChange = function(){
+  this.dispatchEvent( ZH.ui.LiveComponent.EventType.BEFORE_CHANGE)
+};
+
+ZH.ui.LiveComponent.prototype.dispatchChange = function(){
+  this.dispatchEvent( ZH.ui.LiveComponent.EventType.CHANGE)
+};
+
+ZH.ui.LiveComponent.prototype.onActionButtonClick_ = function(e) {
+  var actionButton = this.dom_.getAncestorByClass(e.target, 'action-anchor')
+  if (!actionButton) {
+    return
+  }
+  var componentWrap = this.dom_.getAncestor(e.target, function(el) {
+    if (el.id) {
+      var arr = el.id.split('-')
+      if (arr.length === 3 && arr[0] === 'lc') {
+        return true
+      }
+    }
+  })
+
+  //otherwise it should be handle by inner component.
+  if (componentWrap === this.element_) {
+    var actionName = actionButton.getAttribute('data-action-name')
+    this.autoHandleAction(actionName, actionButton, e)
+  }
+}
+
+ZH.ui.LiveComponent.prototype.autoHandleAction = function(actionName, opt_actionButton, opt_domEvent) {
+  this.invokeShortCircuitingOp_(ZH.core.LiveComponentPlugin.Op.CLICK, actionName, opt_actionButton, opt_domEvent)
+};
+
+/**
+ * Invoke this operation on all plugins with the given arguments.
+ * @param {ZH.core.LiveComponentPlugin.Op} op A plugin op.
+ * @param {...*} var_args The arguments to the plugin.
+ * @private
+ */
+ZH.ui.LiveComponent.prototype.invokeShortCircuitingOp_ = function(op, var_args) {
+  var plugins = this.indexedPlugins_[op];
+  var argList = goog.array.slice(arguments, 1);
+  for (var i = 0; i < plugins.length; ++i) {
+    var plugin = plugins[i];
+    if (plugin.isEnabled(this) || 
+        plugin[ZH.core.LiveComponentPlugin.OPCODE[op]].apply(plugin, argList)) {
+      // if some plug in want stop other plugin to handle this command
+      // return true to prevent be execute.
+      return true
+    }
+  }
+  return false
+};
+
+/**
+ * Registers the plugin with the editable field.
+ * @param {ZH.core.LiveComponentPlugin} plugin The plugin to register.
+ */
+ZH.ui.LiveComponent.prototype.registerPlugin = function(plugin) {
+  var classId = plugin.getTrogClassId();
+  if (this.plugins_[classId]) {
+    this.logger.severe('Cannot register the same class of plugin twice.');
+  }
+  this.plugins_[classId] = plugin;
+
+  // Only key events and execute should have these has* functions with a custom
+  // handler array since they need to be very careful about performance.
+  // The rest of the plugin hooks should be event-based.
+  for (var op in ZH.core.LiveComponentPlugin.OPCODE) {
+    var opcode = ZH.core.LiveComponentPlugin.OPCODE[op];
+    if (plugin[opcode]) {
+      this.indexedPlugins_[op].push(plugin);
+    }
+  }
+  plugin.registerComponentObject(this);
+
+  // By default we enable all plugins for fields that are currently loaded.
+  if (this.isLoaded()) {
+    plugin.enable(this);
+  }
+};
+
+/**
+ * Unregisters the plugin with this field.
+ * @param {ZH.core.LiveComponentPlugin} plugin The plugin to unregister.
+ */
+goog.editor.Field.prototype.unregisterPlugin = function(plugin) {
+  var classId = plugin.getTrogClassId();
+  if (!this.plugins_[classId]) {
+    this.logger.severe('Cannot unregister a plugin that isn\'t registered.');
+  }
+  delete this.plugins_[classId];
+
+  for (var op in ZH.core.LiveComponentPlugin.OPCODE) {
+    var opcode = ZH.core.LiveComponentPlugin.OPCODE[op];
+    if (plugin[opcode]) {
+      goog.array.remove(this.indexedPlugins_[op], plugin);
+    }
+  }
+
+  plugin.unregisterComponentObject(this);
 };
 
 
-
-ZH.core.Registry.getInstance().regist(ZH.ui.LiveComponent.RAW_TYPE_STRING, ZH.ui.LiveComponent);
+ZH.core.Registry.getInstance().registType(ZH.ui.LiveComponent.RAW_TYPE_STRING, ZH.ui.LiveComponent);
 
 
 /**
@@ -1389,15 +1531,15 @@ ZH.core.Registry.getInstance().regist(ZH.ui.LiveComponent.RAW_TYPE_STRING, ZH.ui
 ZH.ui.LiveComponent.ActionEvent = function(actionType, request, opt_event){
     this.type = ZH.ui.LiveComponent.EventType.ACTION;
     this.actionType = actionType;
-    this.request_ = request;
+    this.request = request;
     //Button click event.
-    this.optEvent = opt_event;
+    this.domEvent = opt_event || {};
 };
 
 goog.inherits(ZH.ui.LiveComponent.ActionEvent, goog.events.Event);
 
 ZH.ui.LiveComponent.ActionEvent.prototype.getRequest = function(){
-    return this.request_;
+    return this.request;
 };
 
 

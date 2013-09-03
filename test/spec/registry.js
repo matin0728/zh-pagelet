@@ -53,11 +53,30 @@ describe('Class and instance registry', function(){
 
           this.registry.registInstance(myType, myID, myInstance)
     
-      var storedInstance = this.registry.getInstanceByDomId(myType + '-' + myID)
+      var storedInstance = this.registry.getInstanceByDomId('lc-' + myType + '-' + myID)
       expect(myInstance).to.be.equal(storedInstance)
     })
 
   })
+
+
+  describe('Instance un registry', function(){
+
+    it('Should not get unregisted instance', function(){
+      var myInstance = {},
+          myType = 'myType',
+          myID = 'abcd'
+
+      this.registry.registInstance(myType, myID, myInstance)
+      this.registry.unRegistInstance(myType, myID)
+      var instance = this.registry.getInstanceById(myType, myID)
+
+      expect(instance).to.be.equal.undefined
+
+    })
+  })
+
+
 
 })
 
