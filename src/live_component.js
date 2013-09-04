@@ -19,7 +19,9 @@ goog.require('goog.object');
 goog.require('goog.style');
 goog.require('goog.ui.IdGenerator');
 goog.require('goog.structs.Map');
+goog.require('goog.log');
 goog.require('ZH.core.Registry');
+goog.require('ZH.core.LiveComponentPlugin');
 goog.require('ZH.core.uti');
 
 
@@ -56,8 +58,11 @@ goog.require('ZH.core.uti');
    */
   this.indexedPlugins_ = {};
 
-  for (var op in ZH.core.LiveComponentPlugin.OPCODE) {
-    this.indexedPlugins_[op] = [];
+  var codes = ZH.core.LiveComponentPlugin.OPCODE
+  for (var op in codes) {
+    if (codes.hasOwnProperty(op)) {
+      this.indexedPlugins_[op] = [];
+    }
   }
 
 };
@@ -1252,6 +1257,14 @@ goog.define('ZH.ui.LiveComponent.ALLOW_DETACHED_DECORATION', false);
 /* Bellow : my patch for component. */
 
 /**
+ * The logger for this plugin.
+ * @type {goog.log.Logger}
+ * @protected
+ */
+ ZH.ui.LiveComponent.prototype.logger =
+    goog.log.getLogger('ZH.core.LiveComponent');
+
+/**
  * Type string
  **/
  ZH.ui.LiveComponent.prototype.typeString_ = "ZH.ui.LiveComponent";
@@ -1281,7 +1294,7 @@ ZH.ui.LiveComponent.prototype.getLastRequest = function() {
 };
 
 //live updatable component should IMP this interface.
-ZH.ui.LiveComponent.prototype.liveUpdate = function(htmlString, opt_modal){
+ZH.ui.LiveComponent.prototype.liveUpdate = function(htmlString, opt_modal) {
     if (!htmlString) {
       throw new Error('Invalid html for liveupdate.')
     }
@@ -1343,7 +1356,7 @@ ZH.ui.LiveComponent.prototype.onLiveMessage = function(message) {
 }
 
 ZH.ui.LiveComponent.prototype.findChildsByType = function(typeString, opt_isDeep){
-  var childs = []
+  var childs = [], childsChilds = []
   this.forEachChild(function(child) {
     if (child.getTypeString() === typeString) {
       childs.push(child)
@@ -1353,7 +1366,6 @@ ZH.ui.LiveComponent.prototype.findChildsByType = function(typeString, opt_isDeep
   if (!opt_isDeep) {
     return childs
   } else {
-    var childsChilds = []
     this.forEachChild(function(child) {
       goog.array.extend(childsChilds, child.findChildsByType(typeString, opt_isDeep))
     }, this)
@@ -1457,12 +1469,13 @@ ZH.ui.LiveComponent.prototype.autoHandleAction = function(actionName, opt_action
  * @param {...*} var_args The arguments to the plugin.
  * @private
  */
-ZH.ui.LiveComponent.prototype.invokeShortCircuitingOp_ = function(op, var_args) {
+ZH.ui.LiveComponent.prototype.invokeShortCircuitingOp_ = function(op, commandName, var_args) {
   var plugins = this.indexedPlugins_[op];
-  var argList = goog.array.slice(arguments, 1);
+  var argList = goog.array.slice(arguments, 2);
   for (var i = 0; i < plugins.length; ++i) {
     var plugin = plugins[i];
-    if (plugin.isEnabled(this) || 
+    if (plugin.isEnabled(this) &&
+        plugin.isSupportedCommand(commandName) &&
         plugin[ZH.core.LiveComponentPlugin.OPCODE[op]].apply(plugin, argList)) {
       // if some plug in want stop other plugin to handle this command
       // return true to prevent be execute.
@@ -1486,35 +1499,39 @@ ZH.ui.LiveComponent.prototype.registerPlugin = function(plugin) {
   // Only key events and execute should have these has* functions with a custom
   // handler array since they need to be very careful about performance.
   // The rest of the plugin hooks should be event-based.
-  for (var op in ZH.core.LiveComponentPlugin.OPCODE) {
-    var opcode = ZH.core.LiveComponentPlugin.OPCODE[op];
-    if (plugin[opcode]) {
-      this.indexedPlugins_[op].push(plugin);
+  var codes = ZH.core.LiveComponentPlugin.OPCODE
+  for (var op in codes) {
+    if (codes.hasOwnProperty(op)) {
+      var opcode = codes[op];
+      if (plugin[opcode]) {
+        this.indexedPlugins_[op].push(plugin);
+      }
     }
   }
   plugin.registerComponentObject(this);
 
   // By default we enable all plugins for fields that are currently loaded.
-  if (this.isLoaded()) {
-    plugin.enable(this);
-  }
+  plugin.enable(this);
 };
 
 /**
  * Unregisters the plugin with this field.
  * @param {ZH.core.LiveComponentPlugin} plugin The plugin to unregister.
  */
-goog.editor.Field.prototype.unregisterPlugin = function(plugin) {
+ZH.ui.LiveComponent.prototype.unregisterPlugin = function(plugin) {
   var classId = plugin.getTrogClassId();
   if (!this.plugins_[classId]) {
     this.logger.severe('Cannot unregister a plugin that isn\'t registered.');
   }
   delete this.plugins_[classId];
 
-  for (var op in ZH.core.LiveComponentPlugin.OPCODE) {
-    var opcode = ZH.core.LiveComponentPlugin.OPCODE[op];
-    if (plugin[opcode]) {
-      goog.array.remove(this.indexedPlugins_[op], plugin);
+  var codes = ZH.core.LiveComponentPlugin.OPCODE
+  for (var op in codes) {
+    if (codes.hasOwnProperty(op)) {
+      var opcode = codes[op];
+      if (plugin[opcode]) {
+        goog.array.remove(this.indexedPlugins_[op], plugin);
+      }
     }
   }
 

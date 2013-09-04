@@ -124,7 +124,7 @@ ZH.core.LiveComponentPlugin.prototype.unregisterComponentObject = function(compo
  * @param {ZH.core.LiveComponent} componentObject The component object.
  */
 ZH.core.LiveComponentPlugin.prototype.enable = function(componentObject) {
-  if (this.getComponent() == componentObject) {
+  if (this.getComponent() === componentObject) {
     this.enabled_ = true;
   } else {
     goog.log.error(this.logger, 'Trying to enable an unregistered component with ' +
@@ -138,7 +138,7 @@ ZH.core.LiveComponentPlugin.prototype.enable = function(componentObject) {
  * @param {ZH.core.LiveComponent} componentObject The component object.
  */
 ZH.core.LiveComponentPlugin.prototype.disable = function(componentObject) {
-  if (this.getComponent() == componentObject) {
+  if (this.getComponent() === componentObject) {
     this.enabled_ = false;
   } else {
     goog.log.error(this.logger, 'Trying to disable an unregistered component ' +
@@ -154,7 +154,7 @@ ZH.core.LiveComponentPlugin.prototype.disable = function(componentObject) {
  * @return {boolean} Whether this plugin is enabled for the component object.
  */
 ZH.core.LiveComponentPlugin.prototype.isEnabled = function(componentObject) {
-  return this.getComponent() == componentObject ? this.enabled_ : false;
+  return this.getComponent() === componentObject ? this.enabled_ : false;
 };
 
 
@@ -199,7 +199,7 @@ ZH.core.LiveComponentPlugin.prototype.disposeInternal = function() {
  * @return {string} The ID unique to this plugin class. Note that different
  *     instances off the plugin share the same classId.
  */
-ZH.core.LiveComponentPlugin.prototype.getTrogClassId;
+ZH.core.LiveComponentPlugin.prototype.getTrogClassId = goog.functions.NULL;
 
 
 /**
@@ -255,7 +255,7 @@ ZH.core.LiveComponentPlugin.IRREPRESSIBLE_OPS = goog.object.createSet(
  * @return {boolean} Whether the event was handled and thus should *not* be
  *     propagated to other plugins or handleKeyboardShortcut.
  */
-ZH.core.LiveComponentPlugin.prototype.handleKeyDown;
+ZH.core.LiveComponentPlugin.prototype.handleKeyDown = null;
 
 
 /**
@@ -265,7 +265,7 @@ ZH.core.LiveComponentPlugin.prototype.handleKeyDown;
  * @return {boolean} Whether the event was handled and thus should *not* be
  *     propagated to other plugins or handleKeyboardShortcut.
  */
-ZH.core.LiveComponentPlugin.prototype.handleKeyPress;
+ZH.core.LiveComponentPlugin.prototype.handleKeyPress = null;
 
 
 /**
@@ -274,7 +274,7 @@ ZH.core.LiveComponentPlugin.prototype.handleKeyPress;
  * @return {boolean} Whether the event was handled and thus should *not* be
  *     propagated to other plugins.
  */
-ZH.core.LiveComponentPlugin.prototype.handleKeyUp;
+ZH.core.LiveComponentPlugin.prototype.handleKeyUp = null;
 
 
 /**
@@ -284,7 +284,7 @@ ZH.core.LiveComponentPlugin.prototype.handleKeyUp;
  * @return {boolean} Whether the event was handled and thus should *not* be
  *     propagated to other plugins.
  */
-ZH.core.LiveComponentPlugin.prototype.handleSelectionChange;
+ZH.core.LiveComponentPlugin.prototype.handleSelectionChange = null;
 
 
 /**
@@ -308,7 +308,7 @@ ZH.core.LiveComponentPlugin.prototype.handleSelectionChange;
  *     propagated to other plugins. We also call preventDefault on the event if
  *     the return value is true.
  */
-ZH.core.LiveComponentPlugin.prototype.handleKeyboardShortcut;
+ZH.core.LiveComponentPlugin.prototype.handleKeyboardShortcut = null;
 
 
 /**
@@ -334,8 +334,9 @@ ZH.core.LiveComponentPlugin.prototype.execCommand = function(command, var_args) 
     this.getComponent().dispatchBeforeChange();
   }
 
+  var result
   try {
-    var result = this.execCommandInternal.apply(this, arguments);
+    result = this.execCommandInternal.apply(this, arguments);
   } finally {
     // If the above execCommandInternal call throws an exception, we still need
     // to turn change events back on (see http://b/issue?id=1471355).
@@ -367,19 +368,9 @@ ZH.core.LiveComponentPlugin.prototype.execCommand = function(command, var_args) 
  * @return {*} The result of the execCommand, if any.
  * @protected
  */
-ZH.core.LiveComponentPlugin.prototype.execCommandInternal;
+ZH.core.LiveComponentPlugin.prototype.execCommandInternal = null;
 
-ZH.core.LiveComponentPlugin.prototype.handleKeyDown;
-
-ZH.core.LiveComponentPlugin.prototype.handleKeyPress;
-
-ZH.core.LiveComponentPlugin.prototype.handleKeyUp;
-
-ZH.core.LiveComponentPlugin.prototype.handleSelectionChange;
-
-ZH.core.LiveComponentPlugin.prototype.handleKeyboardShortcut;
-
-ZH.core.LiveComponentPlugin.prototype.handleClick;
+ZH.core.LiveComponentPlugin.prototype.handleClick = null;
 
 
 /**

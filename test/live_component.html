@@ -7,6 +7,10 @@
 </head>
 <body>
     <div id="sample"></div>
+    <div id="lc-democomponent-1">
+        <button id="btn-action-button" class="action-anchor" data-action-name="" 
+                data-action-target="test.action">Action</button>
+    </div>
     <!-- Required for browser reporter -->
     <div id="mocha"></div>
 
@@ -27,8 +31,9 @@
 
     <!-- Include your assertion lib of choice -->
     <script src="js/chai.js" type="text/javascript" charset="utf-8"></script>
-    <script src="js/sinon.js"></script>
     <script src="js/sinon-chai.js"></script>
+    <script src="js/sinon.js"></script>
+
     <script type="text/javascript" charset="utf-8">
         // Setup chai
         var expect = chai.expect;
@@ -49,7 +54,9 @@
         goog.require('goog.style');
         goog.require('goog.ui.IdGenerator');
         goog.require('goog.structs.Map');
+        goog.require('goog.log');
         goog.require('ZH.core.Registry');
+        goog.require('ZH.core.LiveComponentPlugin');
     </script>
     
     <script src="../src/live_component.js" type="text/javascript" charset="utf-8"></script>

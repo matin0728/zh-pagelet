@@ -125,7 +125,55 @@ describe("live component", function(){
       expect(result2).to.be.equal(c4)
 
     })
+  })
+  //end of #child
 
+  describe('#plugin', function() {
+    it('Should invoke available plugin.', function() {
+      var p1 = new ZH.core.LiveComponentPlugin()
+
+      p1.getTrogClassId = sinon.stub().returns('test')
+      p1.isSupportedCommand = sinon.stub().returns(true)
+      //return false to don't prevent other plugin.
+      p1.handleClick = sinon.stub().returns(false)
+
+      var p2 = new ZH.core.LiveComponentPlugin()
+      p2.getTrogClassId = sinon.stub().returns('test2')
+      //p2 dont support this action at this moment.
+      p2.isSupportedCommand = sinon.stub().returns(false)
+      p2.handleClick = sinon.stub().returns(false)
+
+      //add auto listener on element.
+      var c = new ZH.ui.LiveComponent(null, {addDefaultEventListener: true})
+      c.getId = function() {
+        return 'test-component'
+      }
+      c.registerPlugin(p1)
+      c.registerPlugin(p2)
+
+      c.decorate(document.getElementById('lc-democomponent-1'))
+
+      expect(p1.getTrogClassId.calledOnce).to.be.true
+
+      var actionButton = document.getElementById('btn-action-button')
+      actionButton.click()
+
+      expect(p1.handleClick.calledOnce).to.be.true
+
+      //make p2 support this action too.
+      p2.isSupportedCommand = sinon.stub().returns(true)
+      actionButton.click()
+
+      expect(p1.handleClick.calledTwice).to.be.true
+      expect(p2.handleClick.calledOnce).to.be.true
+      
+      //make p1 prevent other plugin to handle action.
+      p1.handleClick = sinon.stub().returns(true)
+      actionButton.click()
+
+      //make sure p2 is still called once.
+      expect(p2.handleClick.calledOnce).to.be.true
+    })
   })
 
 
