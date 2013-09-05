@@ -1,10 +1,9 @@
 /**
- * @fileoverview Abstract API for TrogEdit plugins.
+ * @fileoverview Abstract API for LiveComponent plugins.
  *
- * @see ../demos/editor/editor.html
  */
 
-goog.provide('ZH.core.LiveComponentPlugin');
+goog.provide('ZH.ui.LiveComponentPlugin');
 
 goog.require('goog.events.EventTarget');
 goog.require('goog.functions');
@@ -19,7 +18,7 @@ goog.require('goog.reflect');
  * @constructor
  * @extends {goog.events.EventTarget}
  */
-ZH.core.LiveComponentPlugin = function(opt_options) {
+ZH.ui.LiveComponentPlugin = function(opt_options) {
   goog.events.EventTarget.call(this);
 
   /**
@@ -34,23 +33,23 @@ ZH.core.LiveComponentPlugin = function(opt_options) {
 
   this.options = options
 };
-goog.inherits(ZH.core.LiveComponentPlugin, goog.events.EventTarget);
+goog.inherits(ZH.ui.LiveComponentPlugin, goog.events.EventTarget);
 
-ZH.core.LiveComponentPlugin.prototype.defaults_ = {}
+ZH.ui.LiveComponentPlugin.prototype.defaults_ = {}
 
 /**
  * The component object this plugin is attached to.
  * @type {ZH.core.LiveComponent}
  * @protected
  */
-ZH.core.LiveComponentPlugin.prototype.component_ = null;
+ZH.ui.LiveComponentPlugin.prototype.component_ = null;
 
 
 /**
  * @return {goog.dom.DomHelper?} The dom helper object associated with the
  *     currently active component.
  */
-ZH.core.LiveComponentPlugin.prototype.getComponentHelper = function() {
+ZH.ui.LiveComponentPlugin.prototype.getComponentHelper = function() {
   return this.getComponent() && this.getComponent().getDomHelper();
 };
 
@@ -62,7 +61,7 @@ ZH.core.LiveComponentPlugin.prototype.getComponentHelper = function() {
  * @type {boolean}
  * @private
  */
-ZH.core.LiveComponentPlugin.prototype.autoDispose_ = true;
+ZH.ui.LiveComponentPlugin.prototype.autoDispose_ = true;
 
 
 /**
@@ -70,8 +69,8 @@ ZH.core.LiveComponentPlugin.prototype.autoDispose_ = true;
  * @type {goog.log.Logger}
  * @protected
  */
-ZH.core.LiveComponentPlugin.prototype.logger =
-    goog.log.getLogger('ZH.core.LiveComponentPlugin');
+ZH.ui.LiveComponentPlugin.prototype.logger =
+    goog.log.getLogger('ZH.ui.LiveComponentPlugin');
 
 
 /**
@@ -80,7 +79,7 @@ ZH.core.LiveComponentPlugin.prototype.logger =
  * @protected
  * @suppress {deprecated} Until componentObject can be made private.
  */
-ZH.core.LiveComponentPlugin.prototype.getComponent = function() {
+ZH.ui.LiveComponentPlugin.prototype.getComponent = function() {
   return this.component_;
 };
 
@@ -91,7 +90,7 @@ ZH.core.LiveComponentPlugin.prototype.getComponent = function() {
  * @protected
  * @suppress {deprecated} Until componentObject can be made private.
  */
-ZH.core.LiveComponentPlugin.prototype.setComponent = function(componentObject) {
+ZH.ui.LiveComponentPlugin.prototype.setComponent = function(componentObject) {
   this.component_ = componentObject;
 };
 
@@ -100,7 +99,7 @@ ZH.core.LiveComponentPlugin.prototype.setComponent = function(componentObject) {
  * Registers the component object for use with this plugin.
  * @param {ZH.core.LiveComponent} componentObject The editable component object.
  */
-ZH.core.LiveComponentPlugin.prototype.registerComponentObject = function(componentObject) {
+ZH.ui.LiveComponentPlugin.prototype.registerComponentObject = function(componentObject) {
   this.setComponent(componentObject);
 };
 
@@ -110,7 +109,7 @@ ZH.core.LiveComponentPlugin.prototype.registerComponentObject = function(compone
  * @param {ZH.core.LiveComponent} componentObj The component object. For single-component
  *     plugins, this parameter is ignored.
  */
-ZH.core.LiveComponentPlugin.prototype.unregisterComponentObject = function(componentObj) {
+ZH.ui.LiveComponentPlugin.prototype.unregisterComponentObject = function(componentObj) {
   if (this.getComponent()) {
     this.disable(this.getComponent());
     this.setComponent(null);
@@ -123,7 +122,7 @@ ZH.core.LiveComponentPlugin.prototype.unregisterComponentObject = function(compo
  * object should only be enabled when it is loaded.
  * @param {ZH.core.LiveComponent} componentObject The component object.
  */
-ZH.core.LiveComponentPlugin.prototype.enable = function(componentObject) {
+ZH.ui.LiveComponentPlugin.prototype.enable = function(componentObject) {
   if (this.getComponent() === componentObject) {
     this.enabled_ = true;
   } else {
@@ -137,7 +136,7 @@ ZH.core.LiveComponentPlugin.prototype.enable = function(componentObject) {
  * Disables this plugin for the specified, registered component object.
  * @param {ZH.core.LiveComponent} componentObject The component object.
  */
-ZH.core.LiveComponentPlugin.prototype.disable = function(componentObject) {
+ZH.ui.LiveComponentPlugin.prototype.disable = function(componentObject) {
   if (this.getComponent() === componentObject) {
     this.enabled_ = false;
   } else {
@@ -153,7 +152,7 @@ ZH.core.LiveComponentPlugin.prototype.disable = function(componentObject) {
  * @param {ZH.core.LiveComponent} componentObject The component object.
  * @return {boolean} Whether this plugin is enabled for the component object.
  */
-ZH.core.LiveComponentPlugin.prototype.isEnabled = function(componentObject) {
+ZH.ui.LiveComponentPlugin.prototype.isEnabled = function(componentObject) {
   return this.getComponent() === componentObject ? this.enabled_ : false;
 };
 
@@ -163,7 +162,7 @@ ZH.core.LiveComponentPlugin.prototype.isEnabled = function(componentObject) {
  * component is disposed.
  * @param {boolean} autoDispose Whether to autoDispose.
  */
-ZH.core.LiveComponentPlugin.prototype.setAutoDispose = function(autoDispose) {
+ZH.ui.LiveComponentPlugin.prototype.setAutoDispose = function(autoDispose) {
   this.autoDispose_ = autoDispose;
 };
 
@@ -172,7 +171,7 @@ ZH.core.LiveComponentPlugin.prototype.setAutoDispose = function(autoDispose) {
  * @return {boolean} Whether or not this plugin should automatically be disposed
  *     when it's registered component is disposed.
  */
-ZH.core.LiveComponentPlugin.prototype.isAutoDispose = function() {
+ZH.ui.LiveComponentPlugin.prototype.isAutoDispose = function() {
   return this.autoDispose_;
 };
 
@@ -182,16 +181,16 @@ ZH.core.LiveComponentPlugin.prototype.isAutoDispose = function() {
  *     for commands of this type. This is useful for "seamless" plugins like
  *     dialogs and lorem ipsum.
  */
-ZH.core.LiveComponentPlugin.prototype.isSilentCommand = goog.functions.FALSE;
+ZH.ui.LiveComponentPlugin.prototype.isSilentCommand = goog.functions.FALSE;
 
 
 /** @override */
-ZH.core.LiveComponentPlugin.prototype.disposeInternal = function() {
+ZH.ui.LiveComponentPlugin.prototype.disposeInternal = function() {
   if (this.getComponent()) {
     this.unregisterComponentObject(this.getComponent());
   }
 
-  ZH.core.LiveComponentPlugin.superClass_.disposeInternal.call(this);
+  ZH.ui.LiveComponentPlugin.superClass_.disposeInternal.call(this);
 };
 
 
@@ -199,14 +198,14 @@ ZH.core.LiveComponentPlugin.prototype.disposeInternal = function() {
  * @return {string} The ID unique to this plugin class. Note that different
  *     instances off the plugin share the same classId.
  */
-ZH.core.LiveComponentPlugin.prototype.getTrogClassId = goog.functions.NULL;
+ZH.ui.LiveComponentPlugin.prototype.getTrogClassId = goog.functions.NULL;
 
 
 /**
  * An enum of operations that plugins may support.
  * @enum {number}
  */
-ZH.core.LiveComponentPlugin.Op = {
+ZH.ui.LiveComponentPlugin.Op = {
   KEYDOWN: 1,
   KEYPRESS: 2,
   KEYUP: 3,
@@ -224,28 +223,28 @@ ZH.core.LiveComponentPlugin.Op = {
  * A map from plugin operations to the names of the methods that
  * invoke those operations.
  */
-ZH.core.LiveComponentPlugin.OPCODE = goog.object.transpose(
-    goog.reflect.object(ZH.core.LiveComponentPlugin, {
-      handleKeyDown: ZH.core.LiveComponentPlugin.Op.KEYDOWN,
-      handleKeyPress: ZH.core.LiveComponentPlugin.Op.KEYPRESS,
-      handleKeyUp: ZH.core.LiveComponentPlugin.Op.KEYUP,
-      handleSelectionChange: ZH.core.LiveComponentPlugin.Op.SELECTION,
-      handleKeyboardShortcut: ZH.core.LiveComponentPlugin.Op.SHORTCUT,
-      execCommand: ZH.core.LiveComponentPlugin.Op.EXEC_COMMAND,
-      queryCommandValue: ZH.core.LiveComponentPlugin.Op.QUERY_COMMAND,
-      prepareContentsHtml: ZH.core.LiveComponentPlugin.Op.PREPARE_CONTENTS_HTML,
-      cleanContentsHtml: ZH.core.LiveComponentPlugin.Op.CLEAN_CONTENTS_HTML,
-      cleanContentsDom: ZH.core.LiveComponentPlugin.Op.CLEAN_CONTENTS_DOM
+ZH.ui.LiveComponentPlugin.OPCODE = goog.object.transpose(
+    goog.reflect.object(ZH.ui.LiveComponentPlugin, {
+      handleKeyDown: ZH.ui.LiveComponentPlugin.Op.KEYDOWN,
+      handleKeyPress: ZH.ui.LiveComponentPlugin.Op.KEYPRESS,
+      handleKeyUp: ZH.ui.LiveComponentPlugin.Op.KEYUP,
+      handleSelectionChange: ZH.ui.LiveComponentPlugin.Op.SELECTION,
+      handleKeyboardShortcut: ZH.ui.LiveComponentPlugin.Op.SHORTCUT,
+      execCommand: ZH.ui.LiveComponentPlugin.Op.EXEC_COMMAND,
+      queryCommandValue: ZH.ui.LiveComponentPlugin.Op.QUERY_COMMAND,
+      prepareContentsHtml: ZH.ui.LiveComponentPlugin.Op.PREPARE_CONTENTS_HTML,
+      cleanContentsHtml: ZH.ui.LiveComponentPlugin.Op.CLEAN_CONTENTS_HTML,
+      cleanContentsDom: ZH.ui.LiveComponentPlugin.Op.CLEAN_CONTENTS_DOM
     }));
 
 
 /**
  * A set of op codes that run even on disabled plugins.
  */
-ZH.core.LiveComponentPlugin.IRREPRESSIBLE_OPS = goog.object.createSet(
-    ZH.core.LiveComponentPlugin.Op.PREPARE_CONTENTS_HTML,
-    ZH.core.LiveComponentPlugin.Op.CLEAN_CONTENTS_HTML,
-    ZH.core.LiveComponentPlugin.Op.CLEAN_CONTENTS_DOM);
+ZH.ui.LiveComponentPlugin.IRREPRESSIBLE_OPS = goog.object.createSet(
+    ZH.ui.LiveComponentPlugin.Op.PREPARE_CONTENTS_HTML,
+    ZH.ui.LiveComponentPlugin.Op.CLEAN_CONTENTS_HTML,
+    ZH.ui.LiveComponentPlugin.Op.CLEAN_CONTENTS_DOM);
 
 
 /**
@@ -255,7 +254,7 @@ ZH.core.LiveComponentPlugin.IRREPRESSIBLE_OPS = goog.object.createSet(
  * @return {boolean} Whether the event was handled and thus should *not* be
  *     propagated to other plugins or handleKeyboardShortcut.
  */
-ZH.core.LiveComponentPlugin.prototype.handleKeyDown = null;
+ZH.ui.LiveComponentPlugin.prototype.handleKeyDown = null;
 
 
 /**
@@ -265,7 +264,7 @@ ZH.core.LiveComponentPlugin.prototype.handleKeyDown = null;
  * @return {boolean} Whether the event was handled and thus should *not* be
  *     propagated to other plugins or handleKeyboardShortcut.
  */
-ZH.core.LiveComponentPlugin.prototype.handleKeyPress = null;
+ZH.ui.LiveComponentPlugin.prototype.handleKeyPress = null;
 
 
 /**
@@ -274,7 +273,7 @@ ZH.core.LiveComponentPlugin.prototype.handleKeyPress = null;
  * @return {boolean} Whether the event was handled and thus should *not* be
  *     propagated to other plugins.
  */
-ZH.core.LiveComponentPlugin.prototype.handleKeyUp = null;
+ZH.ui.LiveComponentPlugin.prototype.handleKeyUp = null;
 
 
 /**
@@ -284,7 +283,7 @@ ZH.core.LiveComponentPlugin.prototype.handleKeyUp = null;
  * @return {boolean} Whether the event was handled and thus should *not* be
  *     propagated to other plugins.
  */
-ZH.core.LiveComponentPlugin.prototype.handleSelectionChange = null;
+ZH.ui.LiveComponentPlugin.prototype.handleSelectionChange = null;
 
 
 /**
@@ -308,7 +307,7 @@ ZH.core.LiveComponentPlugin.prototype.handleSelectionChange = null;
  *     propagated to other plugins. We also call preventDefault on the event if
  *     the return value is true.
  */
-ZH.core.LiveComponentPlugin.prototype.handleKeyboardShortcut = null;
+ZH.ui.LiveComponentPlugin.prototype.handleKeyboardShortcut = null;
 
 
 /**
@@ -326,7 +325,7 @@ ZH.core.LiveComponentPlugin.prototype.handleKeyboardShortcut = null;
  *     execute the command.
  * @return {*} The result of the execCommand, if any.
  */
-ZH.core.LiveComponentPlugin.prototype.execCommand = function(command, var_args) {
+ZH.ui.LiveComponentPlugin.prototype.execCommand = function(command, var_args) {
   // TODO(user): Replace all uses of isSilentCommand with plugins that just
   // override this base execCommand method.
   var silent = this.isSilentCommand(command);
@@ -368,9 +367,9 @@ ZH.core.LiveComponentPlugin.prototype.execCommand = function(command, var_args) 
  * @return {*} The result of the execCommand, if any.
  * @protected
  */
-ZH.core.LiveComponentPlugin.prototype.execCommandInternal = null;
+ZH.ui.LiveComponentPlugin.prototype.execCommandInternal = null;
 
-ZH.core.LiveComponentPlugin.prototype.handleClick = null;
+ZH.ui.LiveComponentPlugin.prototype.handleClick = null;
 
 
 /**
@@ -378,7 +377,7 @@ ZH.core.LiveComponentPlugin.prototype.handleClick = null;
  * @param {string} command Command string to check.
  * @return {boolean} Whether the plugin handles this type of command.
  */
-ZH.core.LiveComponentPlugin.prototype.isSupportedCommand = function(command) {
+ZH.ui.LiveComponentPlugin.prototype.isSupportedCommand = function(command) {
   return false;
 };
 
@@ -386,7 +385,7 @@ ZH.core.LiveComponentPlugin.prototype.isSupportedCommand = function(command) {
  * An enum of operations that plugins may support.
  * @enum {number}
  */
-ZH.core.LiveComponentPlugin.Op = {
+ZH.ui.LiveComponentPlugin.Op = {
   KEYDOWN: 1,
   KEYPRESS: 2,
   KEYUP: 3,
@@ -404,17 +403,17 @@ ZH.core.LiveComponentPlugin.Op = {
  * A map from plugin operations to the names of the methods that
  * invoke those operations.
  */
-ZH.core.LiveComponentPlugin.OPCODE = goog.object.transpose(
-    goog.reflect.object(ZH.core.LiveComponentPlugin, {
-      handleKeyDown: ZH.core.LiveComponentPlugin.Op.KEYDOWN,
-      handleKeyPress: ZH.core.LiveComponentPlugin.Op.KEYPRESS,
-      handleKeyUp: ZH.core.LiveComponentPlugin.Op.KEYUP,
-      handleSelectionChange: ZH.core.LiveComponentPlugin.Op.SELECTION,
-      handleKeyboardShortcut: ZH.core.LiveComponentPlugin.Op.SHORTCUT,
-      handleClick: ZH.core.LiveComponentPlugin.Op.CLICK,
-      execCommand: ZH.core.LiveComponentPlugin.Op.EXEC_COMMAND
-      // queryCommandValue: ZH.core.LiveComponentPlugin.Op.QUERY_COMMAND,
-      // prepareContentsHtml: ZH.core.LiveComponentPlugin.Op.PREPARE_CONTENTS_HTML,
-      // cleanContentsHtml: ZH.core.LiveComponentPlugin.Op.CLEAN_CONTENTS_HTML,
-      // cleanContentsDom: ZH.core.LiveComponentPlugin.Op.CLEAN_CONTENTS_DOM
+ZH.ui.LiveComponentPlugin.OPCODE = goog.object.transpose(
+    goog.reflect.object(ZH.ui.LiveComponentPlugin, {
+      handleKeyDown: ZH.ui.LiveComponentPlugin.Op.KEYDOWN,
+      handleKeyPress: ZH.ui.LiveComponentPlugin.Op.KEYPRESS,
+      handleKeyUp: ZH.ui.LiveComponentPlugin.Op.KEYUP,
+      handleSelectionChange: ZH.ui.LiveComponentPlugin.Op.SELECTION,
+      handleKeyboardShortcut: ZH.ui.LiveComponentPlugin.Op.SHORTCUT,
+      handleClick: ZH.ui.LiveComponentPlugin.Op.CLICK,
+      execCommand: ZH.ui.LiveComponentPlugin.Op.EXEC_COMMAND
+      // queryCommandValue: ZH.ui.LiveComponentPlugin.Op.QUERY_COMMAND,
+      // prepareContentsHtml: ZH.ui.LiveComponentPlugin.Op.PREPARE_CONTENTS_HTML,
+      // cleanContentsHtml: ZH.ui.LiveComponentPlugin.Op.CLEAN_CONTENTS_HTML,
+      // cleanContentsDom: ZH.ui.LiveComponentPlugin.Op.CLEAN_CONTENTS_DOM
     }));

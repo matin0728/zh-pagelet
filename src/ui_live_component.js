@@ -21,7 +21,8 @@ goog.require('goog.ui.IdGenerator');
 goog.require('goog.structs.Map');
 goog.require('goog.log');
 goog.require('ZH.core.Registry');
-goog.require('ZH.core.LiveComponentPlugin');
+goog.require('ZH.ui.LiveComponentPlugin');
+goog.require('ZH.core.LiveQuery');
 goog.require('ZH.core.uti');
 
 
@@ -51,14 +52,14 @@ goog.require('ZH.core.uti');
   this.plugins_ = {}
 
   /**
-   * Plugins registered on this field, indexed by the ZH.core.LiveComponentPlugin.Op
+   * Plugins registered on this field, indexed by the ZH.ui.LiveComponentPlugin.Op
    * that they support.
    * @type {Object.<Array>}
    * @private
    */
   this.indexedPlugins_ = {};
 
-  var codes = ZH.core.LiveComponentPlugin.OPCODE
+  var codes = ZH.ui.LiveComponentPlugin.OPCODE
   for (var op in codes) {
     if (codes.hasOwnProperty(op)) {
       this.indexedPlugins_[op] = [];
@@ -1410,24 +1411,24 @@ ZH.ui.LiveComponent.prototype.getMeta = function(key){
 };
 
 ZH.ui.LiveComponent.prototype.findChildByName = function(childName, opt_isDeep){
-    var c = goog.array.find(this.children_, function(child){
-        return child.meta.name === childName;
-    });
-    
-    if(c){
-        return c;
-    }else if(opt_isDeep) {
-        var len = this.children_.length;
-        for(var i=0;i<len;i++) {
-            var child = this.children_[i];
-            if(child){
-                c = this.children_[i].findChildByName(childName, true);
-                if(c){
-                    return c;
-                }
-            }
+  var c = goog.array.find(this.children_, function(child){
+    return child.meta.name === childName;
+  });
+  
+  if(c){
+    return c;
+  }else if(opt_isDeep) {
+    var len = this.children_.length;
+    for(var i=0;i<len;i++) {
+      var child = this.children_[i];
+      if(child){
+        c = this.children_[i].findChildByName(childName, true);
+        if(c){
+          return c;
         }
+      }
     }
+  }
 };
 
 ZH.ui.LiveComponent.prototype.dispatchBeforeChange = function(){
@@ -1440,7 +1441,7 @@ ZH.ui.LiveComponent.prototype.dispatchChange = function(){
 
 ZH.ui.LiveComponent.prototype.onActionButtonClick_ = function(e) {
   var actionButton = this.dom_.getAncestorByClass(e.target, 'action-anchor')
-  if (!actionButton) {
+  if (!actionButton || actionButton.getAttribute('data-action-disabled')) {
     return
   }
   var componentWrap = this.dom_.getAncestor(e.target, function(el) {
@@ -1454,18 +1455,48 @@ ZH.ui.LiveComponent.prototype.onActionButtonClick_ = function(e) {
 
   //otherwise it should be handle by inner component.
   if (componentWrap === this.element_) {
-    var actionName = actionButton.getAttribute('data-action-name')
-    this.autoHandleAction(actionName, actionButton, e)
-  }
-}
+    
+    //ZH.ui.LiveComponent.ActionEvent
+    var actionEvent = this.createActionEventFromElement(actionButton, e)
 
-ZH.ui.LiveComponent.prototype.autoHandleAction = function(actionName, opt_actionButton, opt_domEvent) {
-  this.invokeShortCircuitingOp_(ZH.core.LiveComponentPlugin.Op.CLICK, actionName, opt_actionButton, opt_domEvent)
+    this.autoHandleAction(actionEvent)
+    if (actionEvent.isLiveMutate() && this.dispathActionEvent(actionEvent)) {
+      // Send request using default provider.
+      ZH.net.RequestManager.getProvider().send(actionEvent.getRequest())
+    }
+  }
+};
+
+ZH.ui.LiveComponent.prototype.createActionEventFromElement = function(actionButton, domEvent) {
+  var actionName = actionButton.getAttribute('data-action-name')
+  var uri = actionButton.getAttribute('data-action-uri')
+  if (!uri) {
+    //try default api for this action, ex answer.vote
+    uri = goog.object.get(ZH.ui.LiveComponent.API, actionName, '')
+  }
+  return this.createActionEvent(actionName, actionButton, uri, domEvent)
+};
+
+ZH.ui.LiveComponent.prototype.createActionEvent = function(actionName, actionSource, actionUri, opt_domEvent) {
+  var actionEvent = new ZH.ui.LiveComponent.ActionEvent(actionName, actionSource, opt_domEvent)
+  var request = new ZH.net.Request(actionUri)
+  //add it self to query.
+  // We don't need add it automatically.
+  //equest.addQuery(new ZH.core.LiveQuery(this.getTypeString(), this.getId(), this.meta))
+  actionEvent.setRequest(request)
+};
+
+ZH.ui.LiveComponent.prototype.dispathActionEvent = function(e) {
+  this.dispatchEvent(e)
+};
+
+ZH.ui.LiveComponent.prototype.autoHandleAction = function(actionEvent) {
+  this.invokeShortCircuitingOp_(ZH.ui.LiveComponentPlugin.Op.CLICK, actionEvent.actionName, actionEvent)
 };
 
 /**
  * Invoke this operation on all plugins with the given arguments.
- * @param {ZH.core.LiveComponentPlugin.Op} op A plugin op.
+ * @param {ZH.ui.LiveComponentPlugin.Op} op A plugin op.
  * @param {...*} var_args The arguments to the plugin.
  * @private
  */
@@ -1476,7 +1507,7 @@ ZH.ui.LiveComponent.prototype.invokeShortCircuitingOp_ = function(op, commandNam
     var plugin = plugins[i];
     if (plugin.isEnabled(this) &&
         plugin.isSupportedCommand(commandName) &&
-        plugin[ZH.core.LiveComponentPlugin.OPCODE[op]].apply(plugin, argList)) {
+        plugin[ZH.ui.LiveComponentPlugin.OPCODE[op]].apply(plugin, argList)) {
       // if some plug in want stop other plugin to handle this command
       // return true to prevent be execute.
       return true
@@ -1487,7 +1518,7 @@ ZH.ui.LiveComponent.prototype.invokeShortCircuitingOp_ = function(op, commandNam
 
 /**
  * Registers the plugin with the editable field.
- * @param {ZH.core.LiveComponentPlugin} plugin The plugin to register.
+ * @param {ZH.ui.LiveComponentPlugin} plugin The plugin to register.
  */
 ZH.ui.LiveComponent.prototype.registerPlugin = function(plugin) {
   var classId = plugin.getTrogClassId();
@@ -1499,7 +1530,7 @@ ZH.ui.LiveComponent.prototype.registerPlugin = function(plugin) {
   // Only key events and execute should have these has* functions with a custom
   // handler array since they need to be very careful about performance.
   // The rest of the plugin hooks should be event-based.
-  var codes = ZH.core.LiveComponentPlugin.OPCODE
+  var codes = ZH.ui.LiveComponentPlugin.OPCODE
   for (var op in codes) {
     if (codes.hasOwnProperty(op)) {
       var opcode = codes[op];
@@ -1516,7 +1547,7 @@ ZH.ui.LiveComponent.prototype.registerPlugin = function(plugin) {
 
 /**
  * Unregisters the plugin with this field.
- * @param {ZH.core.LiveComponentPlugin} plugin The plugin to unregister.
+ * @param {ZH.ui.LiveComponentPlugin} plugin The plugin to unregister.
  */
 ZH.ui.LiveComponent.prototype.unregisterPlugin = function(plugin) {
   var classId = plugin.getTrogClassId();
@@ -1525,7 +1556,7 @@ ZH.ui.LiveComponent.prototype.unregisterPlugin = function(plugin) {
   }
   delete this.plugins_[classId];
 
-  var codes = ZH.core.LiveComponentPlugin.OPCODE
+  var codes = ZH.ui.LiveComponentPlugin.OPCODE
   for (var op in codes) {
     if (codes.hasOwnProperty(op)) {
       var opcode = codes[op];
@@ -1539,25 +1570,53 @@ ZH.ui.LiveComponent.prototype.unregisterPlugin = function(plugin) {
 };
 
 
+/**
+ * Default API map for action, ex: { 'answer.vote': '/answer/vote'}
+ */
+ZH.ui.LiveComponent.API = {};
+
+
 ZH.core.Registry.getInstance().registType(ZH.ui.LiveComponent.RAW_TYPE_STRING, ZH.ui.LiveComponent);
 
 
 /**
  * @constructor
  */
-ZH.ui.LiveComponent.ActionEvent = function(actionType, request, opt_event){
-    this.type = ZH.ui.LiveComponent.EventType.ACTION;
-    this.actionType = actionType;
-    this.request = request;
-    //Button click event.
-    this.domEvent = opt_event || {};
+ZH.ui.LiveComponent.ActionEvent = function(actionName, opt_actionSource, opt_domEvent){
+  this.type = ZH.ui.LiveComponent.EventType.ACTION
+  this.actionName = actionName
+  // Who fire the action, usually is a button.
+  this.actionSource = opt_actionSource
+  // request wrapper: typeof ZH.net.Request
+  this.request = null
+  //Usually is button click event.
+  this.domEvent = opt_domEvent || {}
+  // auto update current live component.
+  this.isMutate_ = true
 };
 
 goog.inherits(ZH.ui.LiveComponent.ActionEvent, goog.events.Event);
 
 ZH.ui.LiveComponent.ActionEvent.prototype.getRequest = function(){
-    return this.request;
+  return this.request;
 };
+
+ZH.ui.LiveComponent.ActionEvent.prototype.setRequest = function(request){
+  this.request = request
+};
+
+ZH.ui.LiveComponent.ActionEvent.prototype.preventLiveMutate = function(){
+  this.isMutate_ = false;
+};
+
+ZH.ui.LiveComponent.ActionEvent.prototype.enableLiveMutate = function(){
+  this.isMutate_ = true;
+};
+
+ZH.ui.LiveComponent.ActionEvent.prototype.isLiveMutate = function(){
+  return this.isMutate_
+};
+
 
 
 
