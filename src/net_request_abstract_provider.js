@@ -1,5 +1,8 @@
 goog.provide('ZH.net.AbstractRequestSenderProvider');
 
+goog.require('goog.array')
+goog.require('goog.log');
+
 ZH.net.AbstractRequestSenderProvider = function() {
 
 };
@@ -13,29 +16,21 @@ ZH.net.AbstractRequestSenderProvider.prototype.send = function(request) {
   this.dispathEvent(ZH.net.AbstractRequestSenderProvider.EventType.ON_SEND)
 };
 
+ZH.net.AbstractRequestSenderProvider.prototype.logger =
+    goog.log.getLogger('ZH.net.AbstractRequestSenderProvider');
+
 ZH.net.AbstractRequestSenderProvider.prototype.handleEvent = function(e){
   //TODO: 
-  //on_send, on_error, on_timeout
+  //on_send, on_error, on_timeout, on_complete.
 };
 
-ZH.net.AbstractRequestSenderProvider.prototype.handleResult = function(result){
-  var instances = [];
-  if(request.isAutoHandleResult()){
-      instances = this.autoHandleResult(result);
-  }
-
-  if(result.isError){
-      request.getDeferred().errback(result);
-  }else{
-      result.setInstances(instances);
-      request.getDeferred().callback(result);
-  }
-};
-
-ZH.net.RequestManager.prototype.autoHandleResult = function(result){
-
+ZH.net.AbstractRequestSenderProvider.prototype.handleResult = function(result, request){
   this.dispathEvent(ZH.net.AbstractRequestSenderProvider.EventType.ON_COMPLETE)
-  
+
+  if(result.isError) {
+    request.getDeferred().errback(result);
+  }
+
   if(result.redirectUrl){
       //delay execution.
       if(result.message){
@@ -60,27 +55,38 @@ ZH.net.RequestManager.prototype.autoHandleResult = function(result){
       
   }
 
-  var processor = ZH.core.PageletProcessor.getInstance();
-  processor.setParentsMap(result.parentsMap, result.pagelets);
-  
-  var instances = []
-  goog.array.forEach(result.pagelets, function(p){
-      var instance = ZH.core.PageletProcessor.getInstance().processPagelet(p);
-      //if this is a delete pagelet, no instance will be created.
-      if(instance){
-          instances.push(instance);
-          var childs = result.parentsMap[instance.getIdentity()];
-          if(childs && childs.length){
-              var len = childs.length;
-              for(var i=0;i<len;i++){
-                  processor.initComponent(childs[i], instance);
-              }
-          }
-      }
+  if(request.isAutoHandleResult()){
+    this.autoHandleResult(result, request);
+  } else {
+    request.getDeferred().callback(result);
+  }
+};
 
-  }, this);
-  
-  return instances;
+ZH.net.RequestManager.prototype.autoHandleResult = function(result, request){
+
+  var modules = []
+  goog.array.forEach(result.pagelets, function(p, index) {
+    modules.push(p.module)
+  })
+
+
+  //create closure.
+  var req = request, ret = result
+  //although we ca get module exports on this callback,
+  // but module will regist it self on registry, so we needn't it from
+  // this way.
+  var cb = function() {
+    var processor = ZH.core.PageletProcessor.getInstance();
+    var instances = processor.processPagelet(ret.pagelets)
+    req.getDeferred().callback(req, ret, instances);
+  }
+
+  var require = window['require']
+  if (typeof require === 'function') {
+    require.async(modules, cb)
+  } else {
+    ths.logger.severe('Module loader is not ready, can not process pagelet.')
+  }
 };
 
 
