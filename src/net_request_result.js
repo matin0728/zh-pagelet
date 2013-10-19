@@ -5,9 +5,9 @@ goog.require('goog.array');
 /**
  * @constructor
  */
-ZH.net.RequestResult = function(result){    
+ZH.net.RequestResult = function(result){
   this.rawResult_ = result
-  this.error_ = (result['r'] == 1)
+  this.error_ = (result['r'] === 1)
   this.message_ = result['msg']
   this.redirectUrl_ = result['ru'] || result['redirect']
   this.refreshFlag_ = result['rf'] || result['refresh']
@@ -55,7 +55,7 @@ ZH.net.RequestResult.prototype.getPagelets = function() {
 
 ZH.net.RequestResult.prototype.getInstanceByType = function(typeString){
   return goog.array.find(this.getNewInstances(), function(instance){
-    return instance.getTypeString() == typeString;
+    return instance.getTypeString() === typeString;
   });
 };
 

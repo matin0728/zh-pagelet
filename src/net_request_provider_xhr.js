@@ -14,7 +14,7 @@ ZH.net.XhrRequestSendProvider.prototype.send = function(request){
   this.getHandler().listenOnce(xhr, goog.net.EventType.SUCCESS, function(e){
     var ret = e.target.getResponseJson();
     var result = new ZH.net.RequestResult(ret);
-    this.handlerResult(result, req)      
+    this.handlerResult(result, req)
   });
   xhr.ajax(request);
 };

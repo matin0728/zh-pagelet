@@ -5,7 +5,7 @@ ZH.core.LiveQuery = function(typeString, id, meta) {
   this.typeString = null
   this.id = null
   //meta is a map object.
-  this.meta
+  this.meta = null
 };
 
 ZH.core.LiveQuery.prototype.getJSON = function() {

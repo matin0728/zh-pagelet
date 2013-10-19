@@ -19,8 +19,8 @@ ZH.net.Request = function(requestUri, opt_postData){
   
   //TODO: Check post data type, could be Object? or force to use goog.structs.Map.
   var map;
-  if (goog.isObject(opt_postData) {
-    map = new new goog.structs.Map(opt_postData)
+  if (goog.isObject(opt_postData)) {
+    map = new goog.structs.Map(opt_postData)
   } else {
     map = new goog.structs.Map()
   }

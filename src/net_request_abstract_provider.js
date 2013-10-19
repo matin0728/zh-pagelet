@@ -20,7 +20,7 @@ ZH.net.AbstractRequestSenderProvider.prototype.logger =
     goog.log.getLogger('ZH.net.AbstractRequestSenderProvider');
 
 ZH.net.AbstractRequestSenderProvider.prototype.handleEvent = function(e){
-  //TODO: 
+  //TODO:
   //on_send, on_error, on_timeout, on_complete.
 };
 
@@ -85,7 +85,7 @@ ZH.net.RequestManager.prototype.autoHandleResult = function(result, request){
   if (typeof require === 'function') {
     require.async(modules, cb)
   } else {
-    ths.logger.severe('Module loader is not ready, can not process pagelet.')
+    this.logger.severe('Module loader is not ready, can not process pagelet.')
   }
 };
 
@@ -101,4 +101,3 @@ ZH.net.AbstractRequestSenderProvider.EventType = {
 
 
 
-/

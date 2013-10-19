@@ -42,7 +42,7 @@ ZH.net.Pagelet.RenderPosition = {
 };
 
 ZH.net.Pagelet.RenderType = {
-  RENDER: 'render', 
+  RENDER: 'render',
   DECORATION: 'decoration',
   NONE: 'none',// used for none UI component.
   UPDATING: 'updating', //used for live node update.

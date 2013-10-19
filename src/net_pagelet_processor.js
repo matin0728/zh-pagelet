@@ -31,7 +31,7 @@ ZH.core.PageletProcessor.prototype.processPagelet = function(pagelet){
     var type_ = ZH.core.Registry.getInstance().getConstructor(pagelet.typeString);
     var instance_;
     
-    if(pagelet.renderType == ZH.core.Pagelet.RenderType.UN_RENDER){
+    if(pagelet.renderType === ZH.core.Pagelet.RenderType.UN_RENDER){
         instance_ = ZH.core.Registry.getInstance().getInstanceById(pagelet.typeString, pagelet.instanceIdentity);
         if(!instance_){
             //TODO: Throw exception? or write a log?
@@ -49,7 +49,7 @@ ZH.core.PageletProcessor.prototype.processPagelet = function(pagelet){
         return;
     }
     
-    if(pagelet.renderType == ZH.core.Pagelet.RenderType.UPDATING){
+    if(pagelet.renderType === ZH.core.Pagelet.RenderType.UPDATING){
         //Identity is unique, although no need to pass type string but for instance management, store
         //all instances of one type under a key is signeficantly.
         instance_ = ZH.core.Registry.getInstance().getInstanceById(pagelet.typeString, pagelet.instanceIdentity);
@@ -63,6 +63,7 @@ ZH.core.PageletProcessor.prototype.processPagelet = function(pagelet){
         if(type_.createInstance){
             instance_ = type_.createInstance(pagelet.instanceIdentity);
         }else{
+            /*jshint newcap:false */
             instance_ = new type_();
         }
     }
@@ -93,8 +94,8 @@ ZH.core.PageletProcessor.prototype.processPagelet = function(pagelet){
     // }else
     
     var useParent = true;
-    if(pagelet.renderType == ZH.core.Pagelet.RenderType.DECORATION){
-        if(pagelet.renderPosition == ZH.core.Pagelet.RenderPosition.INNER){
+    if(pagelet.renderType === ZH.core.Pagelet.RenderType.DECORATION){
+        if(pagelet.renderPosition === ZH.core.Pagelet.RenderPosition.INNER){
             referElement.innerHTML = pagelet.markup;
             instance_.decorate(referElement);
         }else{
@@ -103,21 +104,21 @@ ZH.core.PageletProcessor.prototype.processPagelet = function(pagelet){
             //IMPORTANAT: if this is not a element but documentFragment node.
             //Normally, any extra line break or comments outside 
             //elements html code should be stripped in template.
-            if(domElement.nodeType != 1 && domElement.childNodes){
+            if(domElement.nodeType !== 1 && domElement.childNodes){
                 domElement = goog.array.find(domElement.childNodes, function(el){
                     //return firt element node.
-                    return el.nodeType == 1;
+                    return el.nodeType === 1;
                 });
             }
             
-            if(!domElement || domElement.nodeType != 1){
-                throw Error('Dom creation fail.');
+            if(!domElement || domElement.nodeType !== 1){
+                throw new Error('Dom creation fail.');
             }
 
-            if(pagelet.renderPosition == ZH.core.Pagelet.RenderPosition.APPEND){
+            if(pagelet.renderPosition === ZH.core.Pagelet.RenderPosition.APPEND){
                 goog.dom.appendChild(referElement, domElement);
                 useParent = false;
-            }else if(pagelet.renderPosition == ZH.core.Pagelet.RenderPosition.BEFORE){
+            }else if(pagelet.renderPosition === ZH.core.Pagelet.RenderPosition.BEFORE){
                 goog.dom.insertSiblingBefore(domElement, referElement);
             }else{
                 //insert After.
@@ -126,7 +127,7 @@ ZH.core.PageletProcessor.prototype.processPagelet = function(pagelet){
             instance_.decorate(domElement);
         }
         this.computeParent_(instance_, (useParent?referElement.parentNode:referElement));
-    }else if(pagelet.renderType == ZH.core.Pagelet.RenderType.UPDATING){
+    }else if(pagelet.renderType === ZH.core.Pagelet.RenderType.UPDATING){
         if(instance_.onLiveUpdating){
             instance_.onLiveUpdating(pagelet);
         }
@@ -139,7 +140,7 @@ ZH.core.PageletProcessor.prototype.processPagelet = function(pagelet){
 ZH.core.PageletProcessor.prototype.computeParent_ = function(instance, referElement){
     while(referElement){
         if(referElement.getAttribute){
-            var id_ = referElement.id, clientType = referElement.getAttribute('data-ct');;
+            var id_ = referElement.id, clientType = referElement.getAttribute('data-ct');
             if(id_ && clientType){
                 //typeString, instanceId
                 var p = ZH.core.Registry.getInstance().getInstanceById(clientType, id_);
@@ -149,7 +150,7 @@ ZH.core.PageletProcessor.prototype.computeParent_ = function(instance, referElem
                     referElement = null;
                     break;
                 }else{
-                    throw Error('Invalid parent.')
+                    throw new Error('Invalid parent.')
                 }
             }else{
                 referElement = referElement.parentNode;
@@ -167,8 +168,7 @@ ZH.core.PageletProcessor.prototype.initComponent = function(info, opt_parent){
     var type_ = arr_[0], id_ = info;
     var element = goog.dom.getElement(id_);
     if(!element){
-        throw Error('Element not found, ensure node attribute is written.');
-        return;
+        throw new Error('Element not found, ensure node attribute is written.');
     }
     //TODO: Get type constructor from class register.
     var nodeConstructor = ZH.core.Registry.getInstance().getConstructor(type_);
@@ -179,6 +179,7 @@ ZH.core.PageletProcessor.prototype.initComponent = function(info, opt_parent){
         // }else{
         //     instance = new nodeConstructor();
         // }
+        /*jshint newcap:false */
         var instance = nodeConstructor.createInstance?nodeConstructor.createInstance():new nodeConstructor();
         instance.setIdentity(id_);
         
@@ -192,11 +193,13 @@ ZH.core.PageletProcessor.prototype.initComponent = function(info, opt_parent){
             if(childs && childs.length){
                 var len = childs.length;
                 for(var i=0;i<len;i++){
+                    /*jshint noarg:false */
                     arguments.callee(childs[i], instance);
                 }
             }
         }
     }else{
+        throw new Error('constructor not found.')
         //TODO: handle exception, undefined type or module not loaded.
     }
 };

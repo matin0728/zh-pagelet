@@ -20,7 +20,7 @@ ZH.net.RequestManager = function(){
   
 };
 
-ZH.net.RequestManager.providers_ = {}; 
+ZH.net.RequestManager.providers_ = {};
 
 ZH.net.RequestManager.instance_ = null;
 
