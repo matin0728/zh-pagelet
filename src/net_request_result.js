@@ -1,4 +1,4 @@
-goog.provide("ZH.net.RequestResult");
+goog.provide('ZH.net.RequestResult');
 
 goog.require('ZH.net.Pagelet');
 goog.require('goog.array');

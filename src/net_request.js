@@ -1,4 +1,4 @@
-goog.provide("ZH.net.Request");
+goog.provide('ZH.net.Request');
 
 goog.require('ZH.core.Registry');
 

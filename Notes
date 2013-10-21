@@ -1,0 +1,11 @@
+1. Closure lib should be manually put under vendor directory using:
+$mkdir vender
+$cd vender
+$git clone ....
+
+2. 部分临时的 jshint 校验不过，可以使用 /*jshint noarg:false */ 之类的内联临时开关改变一下。
+
+
+
+
+

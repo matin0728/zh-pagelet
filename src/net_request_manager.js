@@ -1,4 +1,4 @@
-goog.provide("ZH.net.RequestManager");
+goog.provide('ZH.net.RequestManager');
 
 goog.require('ZH.net.RequestResult');
 goog.require('ZH.core.PageletProcessor');

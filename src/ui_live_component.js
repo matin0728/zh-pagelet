@@ -1447,6 +1447,7 @@ ZH.ui.LiveComponent.prototype.onActionButtonClick_ = function(e) {
   var componentWrap = this.dom_.getAncestor(e.target, function(el) {
     if (el.id) {
       var arr = el.id.split('-')
+      // every component should has an id: 'lc-[contructor]-[uniqueId]'
       if (arr.length === 3 && arr[0] === 'lc') {
         return true
       }
