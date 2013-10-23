@@ -4,6 +4,7 @@ goog.addDependency('../../../../src/core_registry.js', ['ZH.core.Registry'], ['g
 goog.addDependency('../../../../src/core_uti.js', ['ZH.core.uti'], ['goog.array', 'goog.json', 'goog.string', 'goog.style']);
 goog.addDependency('../../../../src/demo.js', ['ZH.demo'], ['goog.ui.Component']);
 goog.addDependency('../../../../src/live_query.js', ['ZH.core.LiveQuery'], []);
+goog.addDependency('../../../../src/main.js', ['ZH.main'], ['ZH.core.LiveQuery', 'ZH.core.PageletProcessor', 'ZH.core.Registry', 'ZH.core.uti', 'ZH.net.AbstractRequestSenderProvider', 'ZH.net.Pagelet', 'ZH.net.Request', 'ZH.net.RequestManager', 'ZH.net.RequestResult', 'ZH.net.XhrRequestSendProvider', 'ZH.ui.LiveComponent', 'ZH.ui.LiveComponentPlugin']);
 goog.addDependency('../../../../src/net_pagelet.js', ['ZH.net.Pagelet'], []);
 goog.addDependency('../../../../src/net_pagelet_processor.js', ['ZH.core.PageletProcessor'], ['ZH.core.Pagelet', 'ZH.core.Registry', 'ZH.uti', 'goog.array', 'goog.dom']);
 goog.addDependency('../../../../src/net_request.js', ['ZH.net.Request'], ['ZH.core.Registry', 'goog.Uri', 'goog.array', 'goog.async.Deferred', 'goog.json', 'goog.structs.Map']);

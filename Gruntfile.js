@@ -1,3 +1,7 @@
+var crypto = require('crypto')
+var exec   = require('child_process').exec
+var path   = require('path')
+
 module.exports = function(grunt) {
 
   var port = 8981;
@@ -142,6 +146,51 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-mocha');
 
+  function execCommand(cmd, cb) {
+    var child = exec(cmd, cb)
+    child.stdout.pipe(process.stdout)
+    child.stderr.pipe(process.stderr)
+  }
+
+  var COMPILE_SOURCE_FILE = 'src/main.js'
+  var COMPILE_TMP_FILE = 'dist/tmp.js'
+  var COMPILE_OUTPUT_FILE = 'dist/znode_seajs.js'
+  var COMPILE_OUTPUT_FILE_ORIGIN = 'dist/znode.js'
+  var CLOSURE_LIB_PATH = 'vendor/closure-library'
+  var COMPILER_PATH = 'vendor/compiler.jar'
+  grunt.registerTask('compile', function() {
+    var done = this.async()
+    var cmd = 'python ' + CLOSURE_LIB_PATH + '/closure/bin/build/closurebuilder.py '
+             + '--input ' + COMPILE_SOURCE_FILE + ' '
+             + '--root src ' 
+             + '--root ' + CLOSURE_LIB_PATH +' '
+             + '--output_mode compiled '
+             + '-f "--compilation_level=SIMPLE_OPTIMIZATIONS" '
+             + '--compiler_jar ' + COMPILER_PATH + ' '
+             + '--output_file ' + COMPILE_TMP_FILE + ' '
+    //var cmd = 'java -jar vendor/compiler.jar --js ' + COMPILE_SOURCE_FILE + ' --js_output_file ' + COMPILE_OUTPUT_FILE
+
+    //TODO: add wrapper for seajs.
+    execCommand(cmd, function(error, stdout, stderr) {
+      //Save a origin file.
+      grunt.file.copy(COMPILE_TMP_FILE, COMPILE_OUTPUT_FILE_ORIGIN)
+
+      //Create a version with seajs define wrapper.
+      grunt.file.copy(COMPILE_TMP_FILE, COMPILE_OUTPUT_FILE, {
+        process: function(contents, path) {
+          var wrapper = grunt.file.read('scripts/seajs_wrapper.js')
+          var obj = {
+            compiledCode: contents
+          }
+          contents = grunt.template.process(wrapper, {data: obj})
+          return contents
+        }
+      })
+      grunt.file.delete(COMPILE_TMP_FILE)
+      done()
+    })
+  })
+
   grunt.event.on('watch', function(action, filepath, target) {
     grunt.log.writeln(target + ': ' + filepath + ' has ' + action);
   });
@@ -156,4 +205,5 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['jshint', 'closureDepsWriter:standalone', 'mocha', 'less', 'jade']);
   // grunt.registerTask('default', ['uglify']);
   // grunt.registerTask('server', ['server']);
+
 };

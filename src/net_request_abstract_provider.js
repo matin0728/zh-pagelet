@@ -62,31 +62,31 @@ ZH.net.AbstractRequestSenderProvider.prototype.handleResult = function(result, r
   }
 };
 
-ZH.net.RequestManager.prototype.autoHandleResult = function(result, request){
+ZH.net.AbstractRequestSenderProvider.prototype.autoHandleResult = function(result, request){
 
-  var modules = []
-  goog.array.forEach(result.pagelets, function(p, index) {
-    modules.push(p.module)
-  })
+  // var modules = []
+  // goog.array.forEach(result.pagelets, function(p, index) {
+  //   modules.push(p.module)
+  // })
 
 
-  //create closure.
-  var req = request, ret = result
-  //although we ca get module exports on this callback,
-  // but module will regist it self on registry, so we needn't it from
-  // this way.
-  var cb = function() {
-    var processor = ZH.core.PageletProcessor.getInstance();
-    var instances = processor.processPagelet(ret.pagelets)
-    req.getDeferred().callback(req, ret, instances);
-  }
+  // //create closure.
+  // var req = request, ret = result
+  // //although we ca get module exports on this callback,
+  // // but module will regist it self on registry, so we needn't it from
+  // // this way.
+  // var cb = function() {
+  //   var processor = ZH.core.PageletProcessor.getInstance();
+  //   var instances = processor.processPagelet(ret.pagelets)
+  //   req.getDeferred().callback(req, ret, instances);
+  // }
 
-  var require = window['require']
-  if (typeof require === 'function') {
-    require.async(modules, cb)
-  } else {
-    this.logger.severe('Module loader is not ready, can not process pagelet.')
-  }
+  // var require = window['require']
+  // if (typeof require === 'function') {
+  //   require.async(modules, cb)
+  // } else {
+  //   this.logger.severe('Module loader is not ready, can not process pagelet.')
+  // }
 };
 
 
@@ -97,7 +97,7 @@ ZH.net.AbstractRequestSenderProvider.EventType = {
   ON_TIMEOUT: 'on_timeout',
   ON_SUCCESS: 'on_success',
   ON_COMPLETE: 'on_complete'
-}
+};
 
 
 

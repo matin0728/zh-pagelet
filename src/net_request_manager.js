@@ -1,7 +1,7 @@
 goog.provide('ZH.net.RequestManager');
 
 goog.require('ZH.net.RequestResult');
-goog.require('ZH.core.PageletProcessor');
+goog.require('ZH.net.PageletProcessor');
 
 goog.require('goog.array');
 goog.require('goog.dom');

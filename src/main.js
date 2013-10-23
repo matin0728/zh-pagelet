@@ -6,7 +6,7 @@ goog.require('ZH.core.Registry');
 goog.require('ZH.core.uti');
 goog.require('ZH.core.LiveQuery');
 goog.require('ZH.net.Pagelet');
-goog.require('ZH.core.PageletProcessor');
+goog.require('ZH.net.PageletProcessor');
 goog.require('ZH.net.Request');
 goog.require('ZH.net.AbstractRequestSenderProvider');
 goog.require('ZH.net.RequestManager');

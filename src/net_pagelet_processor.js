@@ -1,7 +1,7 @@
-goog.provide('ZH.core.PageletProcessor');
+goog.provide('ZH.net.PageletProcessor');
 
-goog.require('ZH.uti');
-goog.require('ZH.core.Pagelet');
+goog.require('ZH.core.uti');
+goog.require('ZH.net.Pagelet');
 goog.require('goog.dom');
 goog.require('goog.array');
 goog.require('ZH.core.Registry');
@@ -10,28 +10,28 @@ goog.require('ZH.core.Registry');
 /**
  * @constructor
  */
-ZH.core.PageletProcessor = function(){
+ZH.net.PageletProcessor = function(){
     
 };
 
-ZH.core.PageletProcessor.instance_ = null;
+ZH.net.PageletProcessor.instance_ = null;
 
-ZH.core.PageletProcessor.getInstance = function(){
-    var instance_ = ZH.core.PageletProcessor.instance_;
+ZH.net.PageletProcessor.getInstance = function(){
+    var instance_ = ZH.net.PageletProcessor.instance_;
     if(!instance_){
-        instance_ = new ZH.core.PageletProcessor();
-        ZH.core.PageletProcessor.instance_ = instance_;
+        instance_ = new ZH.net.PageletProcessor();
+        ZH.net.PageletProcessor.instance_ = instance_;
     }
     return instance_;
 };
 
-ZH.core.PageletProcessor.prototype.parentsMap_ = null;
+ZH.net.PageletProcessor.prototype.parentsMap_ = null;
 
-ZH.core.PageletProcessor.prototype.processPagelet = function(pagelet){
+ZH.net.PageletProcessor.prototype.processPagelet = function(pagelet){
     var type_ = ZH.core.Registry.getInstance().getConstructor(pagelet.typeString);
     var instance_;
     
-    if(pagelet.renderType === ZH.core.Pagelet.RenderType.UN_RENDER){
+    if(pagelet.renderType === ZH.net.Pagelet.RenderType.UN_RENDER){
         instance_ = ZH.core.Registry.getInstance().getInstanceById(pagelet.typeString, pagelet.instanceIdentity);
         if(!instance_){
             //TODO: Throw exception? or write a log?
@@ -49,7 +49,7 @@ ZH.core.PageletProcessor.prototype.processPagelet = function(pagelet){
         return;
     }
     
-    if(pagelet.renderType === ZH.core.Pagelet.RenderType.UPDATING){
+    if(pagelet.renderType === ZH.net.Pagelet.RenderType.UPDATING){
         //Identity is unique, although no need to pass type string but for instance management, store
         //all instances of one type under a key is signeficantly.
         instance_ = ZH.core.Registry.getInstance().getInstanceById(pagelet.typeString, pagelet.instanceIdentity);
@@ -80,11 +80,11 @@ ZH.core.PageletProcessor.prototype.processPagelet = function(pagelet){
     
     instance_.setIdentity(pagelet.instanceIdentity);
     //NOTE: Render mode is disabled.
-    // if(pagelet.renderType == ZH.core.Pagelet.RenderType.RENDER){
-    //     if(pagelet.renderPosition == ZH.core.Pagelet.RenderPosition.BEFORE){
+    // if(pagelet.renderType == ZH.net.Pagelet.RenderType.RENDER){
+    //     if(pagelet.renderPosition == ZH.net.Pagelet.RenderPosition.BEFORE){
     //         useParent = true;
     //         instance_.renderBefore(referElement);
-    //     }else if(pagelet.renderPosition == ZH.core.Pagelet.RenderPosition.AFTER){
+    //     }else if(pagelet.renderPosition == ZH.net.Pagelet.RenderPosition.AFTER){
     //         useParent = true;
     //         instance_.renderAfter(referElement);
     //     }else{
@@ -94,12 +94,12 @@ ZH.core.PageletProcessor.prototype.processPagelet = function(pagelet){
     // }else
     
     var useParent = true;
-    if(pagelet.renderType === ZH.core.Pagelet.RenderType.DECORATION){
-        if(pagelet.renderPosition === ZH.core.Pagelet.RenderPosition.INNER){
+    if(pagelet.renderType === ZH.net.Pagelet.RenderType.DECORATION){
+        if(pagelet.renderPosition === ZH.net.Pagelet.RenderPosition.INNER){
             referElement.innerHTML = pagelet.markup;
             instance_.decorate(referElement);
         }else{
-            var domElement = goog.dom.htmlToDocumentFragment(ZH.uti.trim(pagelet.markup));
+            var domElement = goog.dom.htmlToDocumentFragment(ZH.core.uti.trim.trim(pagelet.markup));
             
             //IMPORTANAT: if this is not a element but documentFragment node.
             //Normally, any extra line break or comments outside 
@@ -115,10 +115,10 @@ ZH.core.PageletProcessor.prototype.processPagelet = function(pagelet){
                 throw new Error('Dom creation fail.');
             }
 
-            if(pagelet.renderPosition === ZH.core.Pagelet.RenderPosition.APPEND){
+            if(pagelet.renderPosition === ZH.net.Pagelet.RenderPosition.APPEND){
                 goog.dom.appendChild(referElement, domElement);
                 useParent = false;
-            }else if(pagelet.renderPosition === ZH.core.Pagelet.RenderPosition.BEFORE){
+            }else if(pagelet.renderPosition === ZH.net.Pagelet.RenderPosition.BEFORE){
                 goog.dom.insertSiblingBefore(domElement, referElement);
             }else{
                 //insert After.
@@ -127,7 +127,7 @@ ZH.core.PageletProcessor.prototype.processPagelet = function(pagelet){
             instance_.decorate(domElement);
         }
         this.computeParent_(instance_, (useParent?referElement.parentNode:referElement));
-    }else if(pagelet.renderType === ZH.core.Pagelet.RenderType.UPDATING){
+    }else if(pagelet.renderType === ZH.net.Pagelet.RenderType.UPDATING){
         if(instance_.onLiveUpdating){
             instance_.onLiveUpdating(pagelet);
         }
@@ -137,7 +137,7 @@ ZH.core.PageletProcessor.prototype.processPagelet = function(pagelet){
 };
 
 //Walk up the dom tree to find ancestor parent.
-ZH.core.PageletProcessor.prototype.computeParent_ = function(instance, referElement){
+ZH.net.PageletProcessor.prototype.computeParent_ = function(instance, referElement){
     while(referElement){
         if(referElement.getAttribute){
             var id_ = referElement.id, clientType = referElement.getAttribute('data-ct');
@@ -161,9 +161,9 @@ ZH.core.PageletProcessor.prototype.computeParent_ = function(instance, referElem
     }
 };
 
-ZH.core.PageletProcessor.prototype.initComponent = function(info, opt_parent){
+ZH.net.PageletProcessor.prototype.initComponent = function(info, opt_parent){
     //info: [typeString, clientId]
-    var self = ZH.core.PageletProcessor.getInstance();
+    var self = ZH.net.PageletProcessor.getInstance();
     var arr_ = info.split('-');
     var type_ = arr_[0], id_ = info;
     var element = goog.dom.getElement(id_);
@@ -204,11 +204,11 @@ ZH.core.PageletProcessor.prototype.initComponent = function(info, opt_parent){
     }
 };
 
-ZH.core.PageletProcessor.prototype.setParentsMap = function(parentsMap){
+ZH.net.PageletProcessor.prototype.setParentsMap = function(parentsMap){
     this.parentsMap_ = parentsMap;
 };
 
-ZH.core.PageletProcessor.prototype.initComponents = function(rootNodes){
+ZH.net.PageletProcessor.prototype.initComponents = function(rootNodes){
     goog.array.forEach(rootNodes, function(node){
         this.initComponent(node);
     }, this);

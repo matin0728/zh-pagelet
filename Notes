@@ -5,6 +5,7 @@ $git clone ....
 
 2. 部分临时的 jshint 校验不过，可以使用 /*jshint noarg:false */ 之类的内联临时开关改变一下。
 
+3. closure compiler is manually download at vender/compiler.jar
 
 
 
