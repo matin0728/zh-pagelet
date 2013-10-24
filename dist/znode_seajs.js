@@ -504,9 +504,61 @@ ZH.net.Request.prototype.setRequesitUri=function(a){this.requestUri=a};ZH.net.Re
 ZH.net.Request.prototype.getPostData=function(){var a=this.postData.getKeys(),b=[],c=this.postData;goog.array.forEach(a,function(a){b.push(a+"="+encodeURIComponent(c.get(a)))},this);var d=[];goog.array.forEach(this.liveQueries_,function(a){d.push(a.getJSON())},this);b.push("live_components="+encodeURIComponent(goog.json.serialize(d)));return b.join("&")};ZH.main=function(a,b){window.console&&window.console.log("App start")};
 
 
-  ;;ZH.initComponent = function(rootNodesMap, parentChildMap) {
+	;;ZH.dependencyTree = null
+	ZH.parentChildMap = null
+
+  var registry = ZH.core.Registry.getInstance();
+	ZH.initNodeTree = function(currentNodeId, parentId) {
+		var element = goog.dom.getElement(currentNodeId)
+
+    if (!element) {
+      throw new Error('No element found for:' + currentNodeId)
+    }
+
+    goog.array.forEach(ZH.parentChildMap[parentId], function(entry, index) {
+      if (entry['id'] === currentNodeId) {
+        //we got the info for this node.
+        var nodeConstructor = registry.getConstructor(entry['js'])
+        var instance_;
+        if (nodeConstructor) {
+          instance_ = nodeConstructor.createInstance?nodeConstructor.createInstance():null;
+
+          //this type is Singleton.
+          if (!instance_) {
+            instance_ = nodeConstructor.getInstance?nodeConstructor.getInstance():null;
+          }
+
+          if (!instance_ && goog.isFunction(nodeConstructor)) {
+            instance_ = new nodeConstructor(); 
+          }
+
+        }
+
+        if (instance_) {
+          instance_.decorate(element)
+        } else {
+          throw new Error('Can not create instance for type: ' + entry['js'])
+        }
+      }
+    })
+	}
+
+  ZH.initComponent = function(dependencyTree, parentChildMap) {
+  	ZH.dependencyTree = dependencyTree
+		ZH.parentChildMap = parentChildMap
   	if (console) {
   		console.log('init component loaded in !!!!')
+  	}
+
+  	for (k in dependencyTree) {
+  		if (dependencyTree.hasOwnProperty(k)){
+  			var deps = dependencyTree[k];
+  			//get all deps for a tre.
+  			var rootElementId = k;
+  			require.async(deps, goog.partial(function(rootElementId, parentId){
+  				ZH.initNodeTree(rootElementId, parentId)
+  			}, rootElementId, 'ROOT'))
+  		}
   	}
   }
 

@@ -17,6 +17,6 @@ goog.require('ZH.ui.LiveComponentPlugin');
 
 ZH.main = function(rootNodesMap, parentChildMap) {
   if (window.console) {
-  	window.console.log('App start');
+    window.console.log('App start');
   }
 };

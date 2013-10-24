@@ -1,14 +1,14 @@
 describe('Live component plugin interface.', function(){
   beforeEach(function(){
-    this.plugin = new ZH.core.LiveComponentPlugin()
+    this.plugin = new ZH.ui.LiveComponentPlugin()
   })
 
   describe('options', function(){
     it('Should has option set.', function(){
-      this.plugin = new ZH.core.LiveComponentPlugin({myOption: 1})
+      this.plugin = new ZH.ui.LiveComponentPlugin({myOption: 1})
       expect(this.plugin.options.myOption).to.be.equal(1)
 
-      this.plugin = new ZH.core.LiveComponentPlugin({})
+      this.plugin = new ZH.ui.LiveComponentPlugin({})
       //make sure don'effect prototype.
       expect(this.plugin.options.myOption).to.be.undefined
 
