@@ -6,22 +6,18 @@ ZH.net.Pagelet = function(opt_pageletObject) {
   this.html = opt_pageletObject['html']
   
   //{'id' : xxx, js:xxx, css: xx}
-  this.rootNode = opt_pageletObject['root_node']
+  this.rootNode = opt_pageletObject['root_nodes']
 
   // Keep parents/child mapping.
   this.inforMap = opt_pageletObject['infor_map']
 
-  this.referElement = opt_pageletObject['message']['reffer_node'],
-  this.renderType = opt_pageletObject['message']['render_type'],
-  this.renderPosition = opt_pageletObject['message']['render_position'],
+  this.referNode = opt_pageletObject['refer_node']
+  this.renderType = opt_pageletObject['render_type']
+  this.renderPosition = opt_pageletObject['render_position']
 
+  this.message = opt_pageletObject['message']
   // Optional, this is just for update single node.
-  if (opt_pageletObject['message']) {
-    this.message = {
-      eventName : opt_pageletObject['message']['event_name'],
-      eventArgs : opt_pageletObject['message']['event_args']
-    }  
-  }
+  // [ [name, args], [name, args] ]
   
 }
 
