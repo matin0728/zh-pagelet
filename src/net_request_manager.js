@@ -24,6 +24,10 @@ ZH.net.RequestManager.providers_ = {};
 
 ZH.net.RequestManager.instance_ = null;
 
+ZH.net.RequestManager.send = function(request) {
+  return ZH.net.RequestManager.getProvider().send(request)
+}
+
 ZH.net.RequestManager.getProvider = function(opt_porviderName){
   var instance = ZH.net.RequestManager.instance_
   if (!instance) {

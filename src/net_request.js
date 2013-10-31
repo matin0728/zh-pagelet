@@ -104,6 +104,11 @@ ZH.net.Request.prototype.setPostParam = function(k, v){
     return this.postData.set(k, v);
 };
 
+//post data should be goog.structs.Map
+ZH.net.Request.prototype.setPostData = function(postData) {
+  this.postData = postData;
+};
+
 ZH.net.Request.prototype.getPostData = function(){
     var keys = this.postData.getKeys();
     var data_ = [],

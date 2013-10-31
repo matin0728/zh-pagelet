@@ -1,7 +1,8 @@
 goog.provide('ZH.net.AbstractRequestSenderProvider');
 
-goog.require('goog.array')
+goog.require('goog.array');
 goog.require('goog.log');
+goog.require('ZH.core.Registry');
 
 ZH.net.AbstractRequestSenderProvider = function() {
 
@@ -68,6 +69,13 @@ ZH.net.AbstractRequestSenderProvider.prototype.autoHandleResult = function(resul
   // goog.array.forEach(result.pagelets, function(p, index) {
   //   modules.push(p.module)
   // })
+  var Processor = ZH.core.Registry.getInstance().getConstructor('pagelet_processor')
+  if (Processor) {
+    goog.array.forEach(result.pagelets, function(p) {
+      var processor_ = new Processor(p)
+      processor_.process()
+    })
+  }
 
 
   // //create closure.

@@ -24,27 +24,23 @@ define(function(require, exports) {
       }
 
       if ( !instance_ && goog.isFunction(nodeConstructor) ) {
-        instance_ = new nodeConstructor(
-          // This trusted source.
-          goog.json.unsafeParse(element.getAttribute('data-meta') || '{}')
-          , goog.json.unsafeParse(element.getAttribute('data-options') || '{}')
-          );
+        //TODO: Init with config options.
+        instance_ = new nodeConstructor(entry['meta'])
       }
 
     }
 
     if (instance_) {
+      instance_.setId(currentNodeId)
       instance_.decorate(element)
       // Check if has any child node.
       if (ZH.parentChildMap[currentNodeId]) {
         var next = ZH.parentChildMap[currentNodeId];
         var count = next.length;
         for (var k = 0;k < count;k++) {
-          arguments.caller.callee(next[k])  
+          arguments.callee(next[k])  
         }
       } 
-    } else {
-      throw new Error('Can not create instance for type: ' + entry['js'])
     }
 
 	}
@@ -54,7 +50,7 @@ define(function(require, exports) {
 		ZH.parentChildMap = parentChildMap
 
   	for (k in dependencyTree) {
-  		if (dependencyTree.hasOwnProperty(k)){
+  		if (dependencyTree.hasOwnProperty(k)) {
   			var deps = dependencyTree[k];
   			//get all deps for a tree.
   			var rootElementId = k;
@@ -63,10 +59,10 @@ define(function(require, exports) {
         })
   			require.async(deps, goog.partial(function(info){
   				ZH.initNodeTree(info)
-  			}, goog.object.clone(nodeInfo))
+  			}, goog.object.clone(nodeInfo)))
   		}
   	}
-  }
+  };
 
   exports.ZH = ZH;
   exports.goog = goog;

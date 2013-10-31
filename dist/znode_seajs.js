@@ -243,8 +243,8 @@ goog.debug.LogManager.getLoggers=function(){return goog.debug.LogManager.loggers
 goog.debug.LogManager.createFunctionForCatchErrors=function(a){return function(b){(a||goog.debug.LogManager.getRoot()).severe("Error: "+b.message+" ("+b.fileName+" @ Line: "+b.line+")")}};goog.debug.LogManager.createLogger_=function(a){var b=new goog.debug.Logger(a);if(goog.debug.Logger.ENABLE_HIERARCHY){var c=a.lastIndexOf("."),d=a.substr(0,c),c=a.substr(c+1),d=goog.debug.LogManager.getLogger(d);d.addChild_(c,b);b.setParent_(d)}return goog.debug.LogManager.loggers_[a]=b};var ZH={core:{}};ZH.core.Registry=function(){this.classTypeReferMap_=new goog.structs.Map;this.instanceContainer_=new goog.structs.Map};ZH.core.Registry.instance_=null;ZH.core.Registry.getInstance=function(){ZH.core.Registry.instance_||(ZH.core.Registry.instance_=new ZH.core.Registry,ZH.core.Registry.instance_.init());return ZH.core.Registry.instance_};ZH.core.Registry.setNameMap=function(a){var b=new ZH.core.Registry;b.init(a);ZH.core.Registry.instance_=b};
 ZH.core.Registry.prototype.init=function(a){a&&(this.classNameMap_=new goog.structs.Map(a))};ZH.core.Registry.prototype.classNameMap_=null;ZH.core.Registry.prototype.getConstructor=function(a){var b=this.classTypeReferMap_.get(a);if(!b)throw Error("Undefined type: "+a);return b};ZH.core.Registry.prototype.logger=goog.debug.Logger.getLogger("ZH.core.Registry");ZH.core.Registry.prototype.registType=function(a,b){a=this.shortName(a);this.classTypeReferMap_.set(a,b)};
 ZH.core.Registry.prototype.registInstance=function(a,b,c){if(!(a&&b&&c))throw Error("Invalid instance or type to regist.");a=this.shortName(a);var d=this.instanceContainer_.get(a);d||(d=new goog.structs.Map,this.instanceContainer_.set(a,d));d.set(b,c)};ZH.core.Registry.prototype.unRegistInstance=function(a,b){if(a&&b){a=this.shortName(a);var c=this.instanceContainer_.get(a);c&&c.remove(b)}};
-ZH.core.Registry.prototype.shortName=function(a){return this.classNameMap_&&this.classNameMap_.get(a)?this.classNameMap_.get(a):a};ZH.core.Registry.prototype.getInstanceById=function(a,b){if(a&&b){a=this.shortName(a);var c=this.instanceContainer_.get(a);if(c)return c.get(b)}};ZH.core.Registry.prototype.getInstanceByDomId=function(a){if(a)return a=a.split("-"),this.getInstanceById(a[1],a[2])};ZH.net={};ZH.net.Pagelet=function(a){this.module=a.module;this.id=a.id;this.html=a.html;this.map=a.map;this.referElement=a.reffer_node;this.renderType=a.render_type;this.renderPosition=a.render_position;this.eventCategory=a.event_category;this.eventArgs=a.event_args};ZH.net.Pagelet.prototype.module=null;ZH.net.Pagelet.prototype.id=null;ZH.net.Pagelet.prototype.html=null;ZH.net.Pagelet.prototype.referElement=null;ZH.net.Pagelet.prototype.renderType=null;ZH.net.Pagelet.prototype.renderPosition=null;
-ZH.net.Pagelet.prototype.eventType=null;ZH.net.Pagelet.prototype.eventArgs=null;ZH.net.Pagelet.RenderPosition={REPLACE:"replace",APPEND:"append",BEFORE:"before",AFTER:"after"};ZH.net.Pagelet.RenderType={RENDER:"render",DECORATION:"decoration",NONE:"none",UPDATING:"updating",UN_RENDER:"un_render"};goog.json={};goog.json.isValid_=function(a){return/^\s*$/.test(a)?!1:/^[\],:{}\s\u2028\u2029]*$/.test(a.replace(/\\["\\\/bfnrtu]/g,"@").replace(/"[^"\\\n\r\u2028\u2029\x00-\x08\x0a-\x1f]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,"]").replace(/(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g,""))};goog.json.parse=function(a){a=String(a);if(goog.json.isValid_(a))try{return eval("("+a+")")}catch(b){}throw Error("Invalid JSON string: "+a);};goog.json.unsafeParse=function(a){return eval("("+a+")")};
+ZH.core.Registry.prototype.shortName=function(a){return this.classNameMap_&&this.classNameMap_.get(a)?this.classNameMap_.get(a):a};ZH.core.Registry.prototype.getInstanceById=function(a,b){if(a&&b){a=this.shortName(a);var c=this.instanceContainer_.get(a);if(c)return c.get(b)}};ZH.core.Registry.prototype.getInstanceByDomId=function(a){if(a)return a=a.split("-"),this.getInstanceById(a[1],a[2])};ZH.net={};ZH.net.Pagelet=function(a){this.html=a.html;this.rootNode=a.root_nodes;this.inforMap=a.infor_map;this.referNode=a.refer_node;this.renderType=a.render_type;this.renderPosition=a.render_position;this.message=a.message};ZH.net.Pagelet.prototype.rootNodeList=null;ZH.net.Pagelet.prototype.inforMap=null;ZH.net.Pagelet.prototype.html="";ZH.net.Pagelet.prototype.message={};ZH.net.Pagelet.RenderPosition={REPLACE:"replace",APPEND:"append",BEFORE:"before",AFTER:"after"};
+ZH.net.Pagelet.RenderType={RENDER:"render",DECORATION:"decoration",NONE:"none",UPDATING:"updating",UN_RENDER:"un_render"};goog.json={};goog.json.isValid_=function(a){return/^\s*$/.test(a)?!1:/^[\],:{}\s\u2028\u2029]*$/.test(a.replace(/\\["\\\/bfnrtu]/g,"@").replace(/"[^"\\\n\r\u2028\u2029\x00-\x08\x0a-\x1f]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,"]").replace(/(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g,""))};goog.json.parse=function(a){a=String(a);if(goog.json.isValid_(a))try{return eval("("+a+")")}catch(b){}throw Error("Invalid JSON string: "+a);};goog.json.unsafeParse=function(a){return eval("("+a+")")};
 goog.json.serialize=function(a,b){return(new goog.json.Serializer(b)).serialize(a)};goog.json.Serializer=function(a){this.replacer_=a};goog.json.Serializer.prototype.serialize=function(a){var b=[];this.serialize_(a,b);return b.join("")};
 goog.json.Serializer.prototype.serialize_=function(a,b){switch(typeof a){case "string":this.serializeString_(a,b);break;case "number":this.serializeNumber_(a,b);break;case "boolean":b.push(a);break;case "undefined":b.push("null");break;case "object":if(null==a){b.push("null");break}if(goog.isArray(a)){this.serializeArray(a,b);break}this.serializeObject_(a,b);break;case "function":break;default:throw Error("Unknown type: "+typeof a);}};
 goog.json.Serializer.charToJsonCharCache_={'"':'\\"',"\\":"\\\\","/":"\\/","\b":"\\b","\f":"\\f","\n":"\\n","\r":"\\r","\t":"\\t","\x0B":"\\u000b"};goog.json.Serializer.charsToReplace_=/\uffff/.test("\uffff")?/[\\\"\x00-\x1f\x7f-\uffff]/g:/[\\\"\x00-\x1f\x7f-\xff]/g;
@@ -416,15 +416,15 @@ a,b);a.inDocument_&&this.inDocument_&&a.getParent()===this&&this.options.maintai
 ZH.ui.LiveComponent.prototype.hasChildren=function(){return!!this.children_&&0!==this.children_.length};ZH.ui.LiveComponent.prototype.getChildCount=function(){return this.children_?this.children_.length:0};ZH.ui.LiveComponent.prototype.getChildIds=function(){var a=[];this.forEachChild(function(b){a.push(b.getId())});return a};ZH.ui.LiveComponent.prototype.getChild=function(a){return this.childIndex_&&a?goog.object.get(this.childIndex_,a)||null:null};
 ZH.ui.LiveComponent.prototype.getChildAt=function(a){return this.children_?this.children_[a]||null:null};ZH.ui.LiveComponent.prototype.forEachChild=function(a,b){this.children_&&goog.array.forEach(this.children_,a,b)};ZH.ui.LiveComponent.prototype.indexOfChild=function(a){return this.children_&&a?goog.array.indexOf(this.children_,a):-1};
 ZH.ui.LiveComponent.prototype.removeChild=function(a,b){if(a){var c=goog.isString(a)?a:a.getId();a=this.getChild(c);c&&a&&(goog.object.remove(this.childIndex_,c),goog.array.remove(this.children_,a),b&&(a.exitDocument(),a.element_&&goog.dom.removeNode(a.element_)),a.setParent(null))}if(!a)throw Error(ZH.ui.LiveComponent.Error.NOT_OUR_CHILD);return a};ZH.ui.LiveComponent.prototype.removeChildAt=function(a,b){return this.removeChild(this.getChildAt(a),b)};
-ZH.ui.LiveComponent.prototype.removeChildren=function(a){for(var b=[];this.hasChildren();)b.push(this.removeChildAt(0,a));return b};ZH.ui.LiveComponent.prototype.logger=goog.log.getLogger("ZH.core.LiveComponent");ZH.ui.LiveComponent.prototype.typeString_="ZH.ui.LiveComponent";ZH.ui.LiveComponent.prototype.getTypeString=function(){return this.typeString_};ZH.ui.LiveComponent.prototype.setId=function(a){this.id_=a};
-ZH.ui.LiveComponent.prototype.exitDocument=function(){ZH.core.Registry.getInstance().unRegistInstance(this.typeString_,this.getIdentity());ZH.ui.LiveComponent.superClass_.exitDocument.call(this)};ZH.ui.LiveComponent.prototype.getLastAction=function(){return this.currentAction_};ZH.ui.LiveComponent.prototype.getLastRequest=function(){return this.lastRequest_};
+ZH.ui.LiveComponent.prototype.removeChildren=function(a){for(var b=[];this.hasChildren();)b.push(this.removeChildAt(0,a));return b};ZH.ui.LiveComponent.prototype.logger=goog.log.getLogger("ZH.core.LiveComponent");ZH.ui.LiveComponent.prototype.typeString_="live_component";ZH.ui.LiveComponent.prototype.getTypeString=function(){return this.typeString_};ZH.ui.LiveComponent.prototype.setId=function(a){this.id_=a};
+ZH.ui.LiveComponent.prototype.exitDocument=function(){ZH.core.Registry.getInstance().unRegistInstance(this.typeString_,this.getId());ZH.ui.LiveComponent.superClass_.exitDocument.call(this)};ZH.ui.LiveComponent.prototype.getLastAction=function(){return this.currentAction_};ZH.ui.LiveComponent.prototype.getLastRequest=function(){return this.lastRequest_};
 ZH.ui.LiveComponent.prototype.liveUpdate=function(a,b){if(!a)throw Error("Invalid html for liveupdate.");if(this.dispatchEvent(ZH.ui.LiveComponent.EventType.ON_LIVE_UPDATED)){this.forEachChild(function(a){a.dispose()});this.model_=this.childIndex_=this.children_=null;this.googUiComponentHandler_&&(this.googUiComponentHandler_.dispose(),delete this.googUiComponentHandler_);var c=this.dom_.htmlToDocumentFragment(ZH.core.uti.trim(a));1!==c.nodeType&&c.childNodes&&(c=goog.array.find(c.childNodes,function(a){return 1===
 a.nodeType}));this.dom_.replaceNode(c,this.element_);this.inDocument_=this.wasDecorated_=!1;this.decorate(c);b&&this.setModel(b);this.dispatchEvent(ZH.ui.LiveComponent.EventType.LIVE_UPDATED)}};ZH.ui.LiveComponent.prototype.onLiveMessage=function(a){this.dispatchEvent(ZH.ui.LiveComponent.EventType.ON_LIVE_MESSAGE)};
 ZH.ui.LiveComponent.prototype.findChildsByType=function(a,b){var c=[],d=[];this.forEachChild(function(b){b.getTypeString()===a&&c.push(b)},this);if(b)this.forEachChild(function(c){goog.array.extend(d,c.findChildsByType(a,b))},this);else return c;goog.array.extend(c,d);return c};
 ZH.ui.LiveComponent.prototype.findChildByType=function(a,b){var c;this.forEachChild(function(b){c||b.getTypeString()!==a||(c=b)},this);if(c)return c;if(b)return this.forEachChild(function(b){c||(c=b.findChildByType(a,!0))},this),c};ZH.ui.LiveComponent.prototype.getMeta=function(a){if(this.meta[a])return this.meta[a];if(this.parent_)return this.parent_.getMeta(a)};
 ZH.ui.LiveComponent.prototype.findChildByName=function(a,b){var c=goog.array.find(this.children_,function(b){return b.meta.name===a});if(c)return c;if(b)for(var d=this.children_.length,e=0;e<d;e++)if(this.children_[e]&&(c=this.children_[e].findChildByName(a,!0)))return c};ZH.ui.LiveComponent.prototype.dispatchBeforeChange=function(){this.dispatchEvent(ZH.ui.LiveComponent.EventType.BEFORE_CHANGE)};ZH.ui.LiveComponent.prototype.dispatchChange=function(){this.dispatchEvent(ZH.ui.LiveComponent.EventType.CHANGE)};
-ZH.ui.LiveComponent.prototype.onActionButtonClick_=function(a){var b=this.dom_.getAncestorByClass(a.target,"action-anchor");b&&!b.getAttribute("data-action-disabled")&&this.dom_.getAncestor(a.target,function(a){if(a.id&&(a=a.id.split("-"),3===a.length&&"lc"===a[0]))return!0})===this.element_&&(a=this.createActionEventFromElement(b,a),this.autoHandleAction(a),a.isLiveMutate()&&this.dispathActionEvent(a)&&ZH.net.RequestManager.getProvider().send(a.getRequest()))};
-ZH.ui.LiveComponent.prototype.createActionEventFromElement=function(a,b){var c=a.getAttribute("data-action-name"),d=a.getAttribute("data-action-uri");d||(d=goog.object.get(ZH.ui.LiveComponent.API,c,""));return this.createActionEvent(c,a,d,b)};ZH.ui.LiveComponent.prototype.createActionEvent=function(a,b,c,d){a=new ZH.ui.LiveComponent.ActionEvent(a,b,d);c=new ZH.net.Request(c);a.setRequest(c)};ZH.ui.LiveComponent.prototype.dispathActionEvent=function(a){this.dispatchEvent(a)};
+ZH.ui.LiveComponent.prototype.onActionButtonClick_=function(a){var b=this.dom_.getAncestorByClass(a.target,"action-anchor");b&&!b.getAttribute("data-action-disabled")&&this.dom_.getAncestor(a.target,function(a){if(a.id&&(a=a.id.split("-"),3===a.length&&"lc"===a[0]))return!0})===this.element_&&(a=this.createActionEventFromElement(b,a),this.autoHandleAction(a),this.dispatchActionEvent(a)&&(a.isLiveMutate()&&a.getRequest().addQuery(new ZH.core.LiveQuery(this.getTypeString(),this.getId(),this.meta)),
+ZH.net.RequestManager.send(a.getRequest())))};ZH.ui.LiveComponent.prototype.createActionEventFromElement=function(a,b){var c=a.getAttribute("data-action-name"),d=a.getAttribute("data-action-uri");d||(d=goog.object.get(ZH.ui.LiveComponent.API,c,""));return this.createActionEvent(c,a,d,b)};ZH.ui.LiveComponent.prototype.createActionEvent=function(a,b,c,d){a=new ZH.ui.LiveComponent.ActionEvent(a,b,d);c=new ZH.net.Request(c);a.setRequest(c)};ZH.ui.LiveComponent.prototype.dispatchActionEvent=function(a){this.dispatchEvent(a)};
 ZH.ui.LiveComponent.prototype.autoHandleAction=function(a){this.invokeShortCircuitingOp_(ZH.ui.LiveComponentPlugin.Op.CLICK,a.actionName,a)};ZH.ui.LiveComponent.prototype.invokeShortCircuitingOp_=function(a,b,c){for(var d=this.indexedPlugins_[a],e=goog.array.slice(arguments,2),f=0;f<d.length;++f){var g=d[f];if(g.isEnabled(this)&&g.isSupportedCommand(b)&&g[ZH.ui.LiveComponentPlugin.OPCODE[a]].apply(g,e))return!0}return!1};
 ZH.ui.LiveComponent.prototype.registerPlugin=function(a){var b=a.getTrogClassId();this.plugins_[b]&&this.logger.severe("Cannot register the same class of plugin twice.");this.plugins_[b]=a;var b=ZH.ui.LiveComponentPlugin.OPCODE,c;for(c in b)b.hasOwnProperty(c)&&a[b[c]]&&this.indexedPlugins_[c].push(a);a.registerComponentObject(this);a.enable(this)};
 ZH.ui.LiveComponent.prototype.unregisterPlugin=function(a){var b=a.getTrogClassId();this.plugins_[b]||this.logger.severe("Cannot unregister a plugin that isn't registered.");delete this.plugins_[b];var b=ZH.ui.LiveComponentPlugin.OPCODE,c;for(c in b)b.hasOwnProperty(c)&&a[b[c]]&&goog.array.remove(this.indexedPlugins_[c],a);a.unregisterComponentObject(this)};ZH.ui.LiveComponent.API={};ZH.core.Registry.getInstance().registType(ZH.ui.LiveComponent.RAW_TYPE_STRING,ZH.ui.LiveComponent);
@@ -434,9 +434,9 @@ goog.pubsub.PubSub.prototype.subscribeOnce=function(a,b,c){var d=this.subscribe(
 goog.pubsub.PubSub.prototype.unsubscribeByKey=function(a){if(0!=this.publishDepth_)return this.pendingKeys_||(this.pendingKeys_=[]),this.pendingKeys_.push(a),!1;var b=this.subscriptions_[a];if(b){var c=this.topics_[b];c&&goog.array.remove(c,a);delete this.subscriptions_[a];delete this.subscriptions_[a+1];delete this.subscriptions_[a+2]}return!!b};
 goog.pubsub.PubSub.prototype.publish=function(a,b){var c=this.topics_[a];if(c){this.publishDepth_++;for(var d=goog.array.slice(arguments,1),e=0,f=c.length;e<f;e++){var g=c[e];this.subscriptions_[g+1].apply(this.subscriptions_[g+2],d)}this.publishDepth_--;if(this.pendingKeys_&&0==this.publishDepth_)for(;c=this.pendingKeys_.pop();)this.unsubscribeByKey(c);return 0!=e}return!1};
 goog.pubsub.PubSub.prototype.clear=function(a){if(a){var b=this.topics_[a];b&&(goog.array.forEach(b,this.unsubscribeByKey,this),delete this.topics_[a])}else this.subscriptions_.length=0,this.topics_={}};goog.pubsub.PubSub.prototype.getCount=function(a){if(a){var b=this.topics_[a];return b?b.length:0}a=0;for(b in this.topics_)a+=this.getCount(b);return a};
-goog.pubsub.PubSub.prototype.disposeInternal=function(){goog.pubsub.PubSub.superClass_.disposeInternal.call(this);delete this.subscriptions_;delete this.topics_;delete this.pendingKeys_};ZH.net.RequestManager=function(){};ZH.net.RequestManager.providers_={};ZH.net.RequestManager.instance_=null;ZH.net.RequestManager.getProvider=function(a){var b=ZH.net.RequestManager.instance_;b||(b=new ZH.net.RequestManager,ZH.net.RequestManager.instance_=b);a=a||b.defaultProviderName_;var c=goog.object.get(b.providers_,a);c||(c=b.allProviders_[a].getInstance(),b.providers_[a]=c);return c};ZH.net.RequestManager.prototype.setDefaultProvider=function(a){this.defaultProviderName_=a};
-ZH.net.RequestManager.prototype.allProviders_={xhr:ZH.net.XhrRequestSenderProvider,channel:ZH.net.ChannelRequestSerderProvider};ZH.net.RequestManager.prototype.providers_={};ZH.net.RequestManager.prototype.addProvider=function(a,b){this.providers_[a]=b};ZH.net.RequestManager.prototype.defaultProvider_=ZH.net.XhrRequestSenderProvider;ZH.net.RequestManager.prototype.defaultProviderName_="xhr";ZH.net.RequestManager.prototype.logger=goog.debug.Logger.getLogger("ZH.net.RequestManager");
-ZH.net.RequestManager.prototype.handleResultByDefault=function(a){this.showGlobalLoading(!1);return this.autoHandleResult(a)};goog.uri={};goog.uri.utils={};goog.uri.utils.CharCode_={AMPERSAND:38,EQUAL:61,HASH:35,QUESTION:63};goog.uri.utils.buildFromEncodedParts=function(a,b,c,d,e,f,g){var h="";a&&(h+=a+":");c&&(h+="//",b&&(h+=b+"@"),h+=c,d&&(h+=":"+d));e&&(h+=e);f&&(h+="?"+f);g&&(h+="#"+g);return h};goog.uri.utils.splitRe_=RegExp("^(?:([^:/?#.]+):)?(?://(?:([^/?#]*)@)?([^/#?]*?)(?::([0-9]+))?(?=[/#?]|$))?([^?#]+)?(?:\\?([^#]*))?(?:#(.*))?$");
+goog.pubsub.PubSub.prototype.disposeInternal=function(){goog.pubsub.PubSub.superClass_.disposeInternal.call(this);delete this.subscriptions_;delete this.topics_;delete this.pendingKeys_};ZH.net.RequestManager=function(){};ZH.net.RequestManager.providers_={};ZH.net.RequestManager.instance_=null;ZH.net.RequestManager.send=function(a){return ZH.net.RequestManager.getProvider().send(a)};ZH.net.RequestManager.getProvider=function(a){var b=ZH.net.RequestManager.instance_;b||(b=new ZH.net.RequestManager,ZH.net.RequestManager.instance_=b);a=a||b.defaultProviderName_;var c=goog.object.get(b.providers_,a);c||(c=b.allProviders_[a].getInstance(),b.providers_[a]=c);return c};
+ZH.net.RequestManager.prototype.setDefaultProvider=function(a){this.defaultProviderName_=a};ZH.net.RequestManager.prototype.allProviders_={xhr:ZH.net.XhrRequestSenderProvider,channel:ZH.net.ChannelRequestSerderProvider};ZH.net.RequestManager.prototype.providers_={};ZH.net.RequestManager.prototype.addProvider=function(a,b){this.providers_[a]=b};ZH.net.RequestManager.prototype.defaultProvider_=ZH.net.XhrRequestSenderProvider;ZH.net.RequestManager.prototype.defaultProviderName_="xhr";
+ZH.net.RequestManager.prototype.logger=goog.debug.Logger.getLogger("ZH.net.RequestManager");ZH.net.RequestManager.prototype.handleResultByDefault=function(a){this.showGlobalLoading(!1);return this.autoHandleResult(a)};goog.uri={};goog.uri.utils={};goog.uri.utils.CharCode_={AMPERSAND:38,EQUAL:61,HASH:35,QUESTION:63};goog.uri.utils.buildFromEncodedParts=function(a,b,c,d,e,f,g){var h="";a&&(h+=a+":");c&&(h+="//",b&&(h+=b+"@"),h+=c,d&&(h+=":"+d));e&&(h+=e);f&&(h+="?"+f);g&&(h+="#"+g);return h};goog.uri.utils.splitRe_=RegExp("^(?:([^:/?#.]+):)?(?://(?:([^/?#]*)@)?([^/#?]*?)(?::([0-9]+))?(?=[/#?]|$))?([^?#]+)?(?:\\?([^#]*))?(?:#(.*))?$");
 goog.uri.utils.ComponentIndex={SCHEME:1,USER_INFO:2,DOMAIN:3,PORT:4,PATH:5,QUERY_DATA:6,FRAGMENT:7};goog.uri.utils.split=function(a){goog.uri.utils.phishingProtection_();return a.match(goog.uri.utils.splitRe_)};goog.uri.utils.needsPhishingProtection_=goog.userAgent.WEBKIT;
 goog.uri.utils.phishingProtection_=function(){if(goog.uri.utils.needsPhishingProtection_){goog.uri.utils.needsPhishingProtection_=!1;var a=goog.global.location;if(a){var b=a.href;if(b&&(b=goog.uri.utils.getDomain(b))&&b!=a.hostname)throw goog.uri.utils.needsPhishingProtection_=!0,Error();}}};goog.uri.utils.decodeIfPossible_=function(a){return a&&decodeURIComponent(a)};goog.uri.utils.getComponentByIndex_=function(a,b){return goog.uri.utils.split(b)[a]||null};
 goog.uri.utils.getScheme=function(a){return goog.uri.utils.getComponentByIndex_(goog.uri.utils.ComponentIndex.SCHEME,a)};goog.uri.utils.getEffectiveScheme=function(a){a=goog.uri.utils.getScheme(a);!a&&self.location&&(a=self.location.protocol,a=a.substr(0,a.length-1));return a?a.toLowerCase():""};goog.uri.utils.getUserInfoEncoded=function(a){return goog.uri.utils.getComponentByIndex_(goog.uri.utils.ComponentIndex.USER_INFO,a)};goog.uri.utils.getUserInfo=function(a){return goog.uri.utils.decodeIfPossible_(goog.uri.utils.getUserInfoEncoded(a))};
@@ -500,67 +500,78 @@ goog.async.Deferred.AlreadyCalledError=function(a){goog.debug.Error.call(this);t
 goog.async.Deferred.CanceledError.prototype.message="Deferred was canceled";goog.async.Deferred.CanceledError.prototype.name="CanceledError";ZH.net.Request=function(a,b){this.requestUri=goog.isString(a)?new goog.Uri(a):a;this.postData=goog.isObject(b)?new goog.structs.Map(b):new goog.structs.Map;this.showLoading=!0;this.requestMethod="POST";this.liveQueries_=[];this.deferred_=null;this.isAutoHandleResult_=!0};ZH.net.Request.prototype.getDeferred=function(){var a=this.deferred_;a||(this.deferred_=a=new goog.async.Deferred);return a};ZH.net.Request.prototype.preventAutoHandleResult=function(){this.isAutoHandleResult_=!1};
 ZH.net.Request.prototype.isAutoHandleResult=function(){return this.isAutoHandleResult_};ZH.net.Request.prototype.addQuery=function(a){this.liveQueries_.push(a)};ZH.net.Request.prototype.clearQuery=function(){this.liveQueries_=[]};ZH.net.Request.prototype.getQueries=function(){return this.liveQueries_};ZH.net.Request.prototype.filterQuery=function(a,b){this.liveQueries_=goog.array.filter(this.liveQueries_,a,b)};
 ZH.net.Request.prototype.removeQueryByType=function(a){this.liveQueries_=goog.array.filter(this.liveQueries_,function(b){return b.typeString!==ZH.core.Registry.getInstance().shortName(a)},this)};ZH.net.Request.prototype.isShowGlobalLoading=function(){return this.showLoading};ZH.net.Request.prototype.setGlobalLoadingEnabled=function(a){this.showLoading=a};ZH.net.Request.prototype.setMethod=function(a){this.requestMethod="GET"===a?"GET":"POST"};ZH.net.Request.prototype.getRequestPath=function(){return this.requestUri.toString()};
-ZH.net.Request.prototype.setRequesitUri=function(a){this.requestUri=a};ZH.net.Request.prototype.getRequesitUri=function(){return this.requestUri};ZH.net.Request.prototype.setUrlParam=function(a,b){return this.requestUri.setParameterValue(a,b)};ZH.net.Request.prototype.setPostParam=function(a,b){return this.postData.set(a,b)};
-ZH.net.Request.prototype.getPostData=function(){var a=this.postData.getKeys(),b=[],c=this.postData;goog.array.forEach(a,function(a){b.push(a+"="+encodeURIComponent(c.get(a)))},this);var d=[];goog.array.forEach(this.liveQueries_,function(a){d.push(a.getJSON())},this);b.push("live_components="+encodeURIComponent(goog.json.serialize(d)));return b.join("&")};ZH.main=function(a,b){window.console&&window.console.log("App start")};
+ZH.net.Request.prototype.setRequesitUri=function(a){this.requestUri=a};ZH.net.Request.prototype.getRequesitUri=function(){return this.requestUri};ZH.net.Request.prototype.setUrlParam=function(a,b){return this.requestUri.setParameterValue(a,b)};ZH.net.Request.prototype.setPostParam=function(a,b){return this.postData.set(a,b)};ZH.net.Request.prototype.setPostData=function(a){this.postData=a};
+ZH.net.Request.prototype.getPostData=function(){var a=this.postData.getKeys(),b=[],c=this.postData;goog.array.forEach(a,function(a){b.push(a+"="+encodeURIComponent(c.get(a)))},this);var d=[];goog.array.forEach(this.liveQueries_,function(a){d.push(a.getJSON())},this);b.push("live_components="+encodeURIComponent(goog.json.serialize(d)));return b.join("&")};goog.dom.forms={};goog.dom.forms.getFormDataMap=function(a){var b=new goog.structs.Map;goog.dom.forms.getFormDataHelper_(a,b,goog.dom.forms.addFormDataToMap_);return b};goog.dom.forms.getFormDataString=function(a){var b=[];goog.dom.forms.getFormDataHelper_(a,b,goog.dom.forms.addFormDataToStringBuffer_);return b.join("&")};
+goog.dom.forms.getFormDataHelper_=function(a,b,c){for(var d=a.elements,e,f=0;e=d[f];f++)if(e.form==a&&!e.disabled&&"fieldset"!=e.tagName.toLowerCase()){var g=e.name;switch(e.type.toLowerCase()){case "file":case "submit":case "reset":case "button":break;case "select-multiple":e=goog.dom.forms.getValue(e);if(null!=e)for(var h,k=0;h=e[k];k++)c(b,g,h);break;default:h=goog.dom.forms.getValue(e),null!=h&&c(b,g,h)}}d=a.getElementsByTagName("input");for(f=0;e=d[f];f++)e.form==a&&"image"==e.type.toLowerCase()&&
+(g=e.name,c(b,g,e.value),c(b,g+".x","0"),c(b,g+".y","0"))};goog.dom.forms.addFormDataToMap_=function(a,b,c){var d=a.get(b);d||(d=[],a.set(b,d));d.push(c)};goog.dom.forms.addFormDataToStringBuffer_=function(a,b,c){a.push(encodeURIComponent(b)+"="+encodeURIComponent(c))};goog.dom.forms.hasFileInput=function(a){a=a.elements;for(var b,c=0;b=a[c];c++)if(!b.disabled&&b.type&&"file"==b.type.toLowerCase())return!0;return!1};
+goog.dom.forms.setDisabled=function(a,b){if("FORM"==a.tagName)for(var c=a.elements,d=0;a=c[d];d++)goog.dom.forms.setDisabled(a,b);else!0==b&&a.blur(),a.disabled=b};goog.dom.forms.focusAndSelect=function(a){a.focus();a.select&&a.select()};goog.dom.forms.hasValue=function(a){return!!goog.dom.forms.getValue(a)};goog.dom.forms.hasValueByName=function(a,b){return!!goog.dom.forms.getValueByName(a,b)};
+goog.dom.forms.getValue=function(a){var b=a.type;if(!goog.isDef(b))return null;switch(b.toLowerCase()){case "checkbox":case "radio":return goog.dom.forms.getInputChecked_(a);case "select-one":return goog.dom.forms.getSelectSingle_(a);case "select-multiple":return goog.dom.forms.getSelectMultiple_(a);default:return goog.isDef(a.value)?a.value:null}};goog.dom.$F=goog.dom.forms.getValue;
+goog.dom.forms.getValueByName=function(a,b){var c=a.elements[b];if(c){if(c.type)return goog.dom.forms.getValue(c);for(var d=0;d<c.length;d++){var e=goog.dom.forms.getValue(c[d]);if(e)return e}}return null};goog.dom.forms.getInputChecked_=function(a){return a.checked?a.value:null};goog.dom.forms.getSelectSingle_=function(a){var b=a.selectedIndex;return 0<=b?a.options[b].value:null};
+goog.dom.forms.getSelectMultiple_=function(a){for(var b=[],c,d=0;c=a.options[d];d++)c.selected&&b.push(c.value);return b.length?b:null};goog.dom.forms.setValue=function(a,b){var c=a.type;if(goog.isDef(c))switch(c.toLowerCase()){case "checkbox":case "radio":goog.dom.forms.setInputChecked_(a,b);break;case "select-one":goog.dom.forms.setSelectSingle_(a,b);break;case "select-multiple":goog.dom.forms.setSelectMultiple_(a,b);break;default:a.value=goog.isDefAndNotNull(b)?b:""}};
+goog.dom.forms.setInputChecked_=function(a,b){a.checked=b?"checked":null};goog.dom.forms.setSelectSingle_=function(a,b){a.selectedIndex=-1;if(goog.isString(b))for(var c,d=0;c=a.options[d];d++)if(c.value==b){c.selected=!0;break}};goog.dom.forms.setSelectMultiple_=function(a,b){goog.isString(b)&&(b=[b]);for(var c,d=0;c=a.options[d];d++)if(c.selected=!1,b)for(var e,f=0;e=b[f];f++)c.value==e&&(c.selected=!0)};ZH.main=function(a,b){};
 
 
 	;;ZH.dependencyTree = null
 	ZH.parentChildMap = null
 
   var registry = ZH.core.Registry.getInstance();
-	ZH.initNodeTree = function(currentNodeId, parentId) {
-		var element = goog.dom.getElement(currentNodeId)
-
+	ZH.initNodeTree = function(entry) {
+    var currentNodeId = entry['id']
+    var element = goog.dom.getElement(currentNodeId)
     if (!element) {
-      throw new Error('No element found for:' + currentNodeId)
+      throw new Error('Can not find element for: ' + currentNodeId + '@' + entry['js'])
+    }
+    //we got the info for this node.
+    var nodeConstructor = registry.getConstructor(entry['js'])
+    var instance_;
+    if (nodeConstructor) {
+      instance_ = nodeConstructor.createInstance?nodeConstructor.createInstance():null;
+
+      //this type is Singleton.
+      if (!instance_) {
+        instance_ = nodeConstructor.getInstance?nodeConstructor.getInstance():null;
+      }
+
+      if ( !instance_ && goog.isFunction(nodeConstructor) ) {
+        //TODO: Init with config options.
+        instance_ = new nodeConstructor(entry['meta'])
+      }
+
     }
 
-    goog.array.forEach(ZH.parentChildMap[parentId], function(entry, index) {
-      if (entry['id'] === currentNodeId) {
-        //we got the info for this node.
-        var nodeConstructor = registry.getConstructor(entry['js'])
-        var instance_;
-        if (nodeConstructor) {
-          instance_ = nodeConstructor.createInstance?nodeConstructor.createInstance():null;
-
-          //this type is Singleton.
-          if (!instance_) {
-            instance_ = nodeConstructor.getInstance?nodeConstructor.getInstance():null;
-          }
-
-          if (!instance_ && goog.isFunction(nodeConstructor)) {
-            instance_ = new nodeConstructor(); 
-          }
-
+    if (instance_) {
+      instance_.setId(currentNodeId)
+      instance_.decorate(element)
+      // Check if has any child node.
+      if (ZH.parentChildMap[currentNodeId]) {
+        var next = ZH.parentChildMap[currentNodeId];
+        var count = next.length;
+        for (var k = 0;k < count;k++) {
+          arguments.callee(next[k])  
         }
+      } 
+    }
 
-        if (instance_) {
-          instance_.decorate(element)
-        } else {
-          throw new Error('Can not create instance for type: ' + entry['js'])
-        }
-      }
-    })
 	}
 
   ZH.initComponent = function(dependencyTree, parentChildMap) {
   	ZH.dependencyTree = dependencyTree
 		ZH.parentChildMap = parentChildMap
-  	if (console) {
-  		console.log('init component loaded in !!!!')
-  	}
 
   	for (k in dependencyTree) {
-  		if (dependencyTree.hasOwnProperty(k)){
+  		if (dependencyTree.hasOwnProperty(k)) {
   			var deps = dependencyTree[k];
-  			//get all deps for a tre.
+  			//get all deps for a tree.
   			var rootElementId = k;
-  			require.async(deps, goog.partial(function(rootElementId, parentId){
-  				ZH.initNodeTree(rootElementId, parentId)
-  			}, rootElementId, 'ROOT'))
+        var nodeInfo = goog.array.find(ZH.parentChildMap['ROOT'], function(entry){
+          return entry['id'] === rootElementId
+        })
+  			require.async(deps, goog.partial(function(info){
+  				ZH.initNodeTree(info)
+  			}, goog.object.clone(nodeInfo)))
   		}
   	}
-  }
+  };
 
   exports.ZH = ZH;
   exports.goog = goog;

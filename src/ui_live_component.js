@@ -1266,9 +1266,9 @@ goog.define('ZH.ui.LiveComponent.ALLOW_DETACHED_DECORATION', false);
     goog.log.getLogger('ZH.core.LiveComponent');
 
 /**
- * Type string
+ * Type string: always been your compoent file name, without ext name.
  **/
- ZH.ui.LiveComponent.prototype.typeString_ = "ZH.ui.LiveComponent";
+ ZH.ui.LiveComponent.prototype.typeString_ = 'live_component';
 
 
 ZH.ui.LiveComponent.prototype.getTypeString = function(){
@@ -1280,7 +1280,7 @@ ZH.ui.LiveComponent.prototype.setId = function(clientIdentity){
 };
 
 ZH.ui.LiveComponent.prototype.exitDocument = function() {
-    ZH.core.Registry.getInstance().unRegistInstance(this.typeString_, this.getIdentity());
+    ZH.core.Registry.getInstance().unRegistInstance(this.typeString_, this.getId());
     goog.base(this, 'exitDocument');
 };
 
@@ -1461,9 +1461,13 @@ ZH.ui.LiveComponent.prototype.onActionButtonClick_ = function(e) {
     var actionEvent = this.createActionEventFromElement(actionButton, e)
 
     this.autoHandleAction(actionEvent)
-    if (actionEvent.isLiveMutate() && this.dispathActionEvent(actionEvent)) {
+    if (this.dispatchActionEvent(actionEvent)) {
+      // if self needs updated.
+      if (actionEvent.isLiveMutate()) {
+        actionEvent.getRequest().addQuery(new ZH.core.LiveQuery(this.getTypeString(), this.getId(), this.meta))
+      }
       // Send request using default provider.
-      ZH.net.RequestManager.getProvider().send(actionEvent.getRequest())
+      ZH.net.RequestManager.send(actionEvent.getRequest())
     }
   }
 };
@@ -1487,7 +1491,7 @@ ZH.ui.LiveComponent.prototype.createActionEvent = function(actionName, actionSou
   actionEvent.setRequest(request)
 };
 
-ZH.ui.LiveComponent.prototype.dispathActionEvent = function(e) {
+ZH.ui.LiveComponent.prototype.dispatchActionEvent = function(e) {
   this.dispatchEvent(e)
 };
 

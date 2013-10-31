@@ -15,8 +15,11 @@ goog.require('ZH.net.RequestResult');
 goog.require('ZH.ui.LiveComponent');
 goog.require('ZH.ui.LiveComponentPlugin');
 
+//add by customer:
+goog.require('goog.dom.forms');
+
 ZH.main = function(rootNodesMap, parentChildMap) {
-  if (window.console) {
-    window.console.log('App start');
-  }
+  // if (window.console) {
+  //   window.console.log('App start');
+  // }
 };
