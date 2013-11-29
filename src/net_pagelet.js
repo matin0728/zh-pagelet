@@ -1,6 +1,8 @@
+goog.provide('ZH.net.Pagelet')
+
 goog.require('goog.object')
 goog.require('goog.array')
-goog.provide('ZH.net.Pagelet')
+
 
 // Pagelet wrapper class.
 // A pagelet represent a single tree node.
@@ -8,9 +10,9 @@ ZH.net.Pagelet = function(opt_pageletObject) {
   this.html_ = opt_pageletObject['html'] || ''
 
   // This used only for updating existing node.
-  this.targetClientId_ = opt_pageletObject['target_client_id']
+  this.targetClientId_ = opt_pageletObject['target_client_id'] || ''
   // This used only for updating or un_rendering.
-  this.targetClass_ = opt_pageletObject['target_class']
+  this.targetClass_ = opt_pageletObject['target_class'] || ''
   
   //[{'id' : xxx, js:xxx, css: xx}, ...]
   this.dependencyTree_ = opt_pageletObject['dependency_tree']

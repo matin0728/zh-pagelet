@@ -44,7 +44,7 @@ module.exports = function(grunt) {
       // ex: admin: [ 'test/admin.html' ]
       all: [ 'test/**/*.html' ],
       options: {
-        reporter: 'Nyan'
+        //reporter: 'Nyan'
       }
     },
     // connect: {

@@ -1,6 +1,6 @@
 /**
  * @matin0728
- * design pattern that all live components should follow.
+ * base class for all live component.
  *
  */
 
@@ -1295,7 +1295,7 @@ ZH.ui.LiveComponent.prototype.getLastRequest = function() {
 };
 
 //live updatable component should IMP this interface.
-ZH.ui.LiveComponent.prototype.liveUpdate = function(htmlString, opt_modal) {
+ZH.ui.LiveComponent.prototype.liveUpdate = function(htmlString, opt_message) {
     if (!htmlString) {
       throw new Error('Invalid html for liveupdate.')
     }
@@ -1342,8 +1342,9 @@ ZH.ui.LiveComponent.prototype.liveUpdate = function(htmlString, opt_modal) {
       //re-init whole component.
       this.decorate(newElement);
       
-      if (opt_modal) {
-        this.setModel(opt_modal)
+      if (opt_message) {
+        this.setModel(opt_message['model'])
+        this.onLiveMessage(opt_message)
       }
 
       this.dispatchEvent(ZH.ui.LiveComponent.EventType.LIVE_UPDATED)
